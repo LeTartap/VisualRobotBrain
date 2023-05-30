@@ -1,0 +1,55 @@
+﻿<qa_root>
+    <dialog id="0001">
+        <answerlist>
+            <answer type="certain">Mijn naam is Anna. Ik ben een virtuele assistent.</answer>
+        </answerlist>
+        <questionlist>
+            <question>Mijn naam is</question>
+            <question>Ik heet</question>
+            <question>Ik ben</question>
+            <question>Wat is jouw naam</question>
+            <question>Hoe word je genoemd</question>
+        </questionlist>
+    </dialog>
+    <dialog id="0002">
+        <answerlist>
+            <answer type="certain">Tof, wil je mij vertellen waarom het goed gaat?</answer>
+        </answerlist>
+        <questionlist>
+            <question>Goed</question>
+            <question>Prima</question>
+            <question>Geweldig</question>
+            <question>Fantastisch</question>
+        </questionlist>
+    </dialog>
+    <dialog id="0003">
+        <answerlist>
+            <answer type="certain">Dat kan beter, wil je met mij delen wat er goed gaat?</answer>
+        </answerlist>
+        <questionlist>
+            <question>Gaat wel</question>
+            <question>Wel oké</question>
+        </questionlist>
+    </dialog>
+    <dialog id="0004">
+        <answerlist>
+            <answer type="certain">Hopelijk gaat het snel beter!</answer>
+        </answerlist>
+        <questionlist>
+            <question>Niet best.</question>
+            <question>Slecht</question>
+            <question>Niet oké</question>
+            <question>Niet zo goed</question>            
+        </questionlist>
+    </dialog>
+    <dialog id="0005">
+        <answerlist>
+            <answer type="certain">Tot de volgende keer</answer>
+        </answerlist>
+        <questionlist>
+            <question>Doei</question>            
+            <question>Dag</question>            
+            <question>Tot de volgende keer</question>            
+        </questionlist>
+    </dialog>    
+</qa_root>

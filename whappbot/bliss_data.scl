@@ -1,0 +1,12 @@
+# Author: Jelte van Waterschoot
+# Group: Human Media Interaction, University of Twente
+# Contact: j.b.vanwaterschoot@utwente.nl
+
+? BLOCK resetData
+    # Self-disclose: yes: 1, no: 0
+    ? sd = NOW % 2
+    # Log which contains audio and texts of both agent and user, together with timestamps.
+    ? log = []
+    # <<sd>>
+    # Profile which contains information about the user.
+    ? profile = {'name':NULL, 'birthyear':NULL,'birthplace':NULL, 'childhoodplace':NULL,"old_games":NULL,"new_games":NULL,"sd":sd,"log":log}

@@ -1,0 +1,302 @@
+[
+  {
+    "id": 1,
+    "intent": "greeting",
+    "content": "Hello! Have you ever talked with a computer before?",
+    "turn": "assign"
+  },
+  {
+    "id": 2,
+    "intent": "question",
+    "content": "Well, tell me more about which ones.",
+    "turn": "assign",
+    "conditions": [
+      {
+        "move": {
+          "agent": {
+            "id": 1
+          },
+          "user": {
+            "intent": "confirm"
+          }
+        },
+        "notmove": {
+          "agent": {
+            "id": 3
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": 3,
+    "intent": "inform",
+    "content": "Alright, I have to admit I also have never talked with people before today.",
+    "turn": "keep",
+    "conditions": [
+      {
+        "move": {
+          "agent": {
+            "id": 1
+          },
+          "user": {
+            "intent" : "disconfirm"
+          }
+        },
+        "notmove": {
+          "agent": {
+            "id": 2
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": 4,
+    "intent": "inform",
+    "content": "How are you liking talking with me?",
+    "turn": "assign",
+    "conditions": [
+      {
+        "move": {
+          "agent": {
+            "id": 2
+          },
+          "user": {
+          }
+        }
+      },
+      {
+        "move": {
+          "agent": {
+            "id": 3
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id" : 5,
+    "intent": "inform",
+    "content": "I get it, I can be very scary.",
+    "turn": "keep",
+    "conditions" :[ {
+      "move" : {
+        "agent": {
+          "id": 4
+        },
+        "user": {
+          "emotion": [-1,-0.5]
+        }
+      },
+      "notmove": {
+        "agent": {
+          "id": [6,7]
+        }
+      }
+    }
+    ]
+  },
+  {
+    "id" : 6,
+    "intent": "inform",
+    "content": "I'm curious what you'll be thinking at the end of this conversation.",
+    "turn": "keep",
+    "conditions" : [{
+      "move" : {
+        "agent": {
+          "id": 4
+        },
+        "user": {
+          "emotion": [-0.5,0.5]
+        }
+      },
+      "notmove": {
+        "agent": {
+          "id": [5,7]
+        }
+      }
+    }]
+  },
+  {
+    "id" : 7,
+    "intent": "inform",
+    "content": "You make me blush!",
+    "turn": "keep",
+    "conditions" : [
+      {
+        "move" : {
+          "agent": {
+            "id": 4
+          },
+          "user": {
+            "emotion": [0.5,1.1]
+          }
+        },
+        "notmove": {
+          "agent": {
+            "id": [5,6]
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": 8,
+    "intent": "inform",
+    "content" : "Now, I would like to get to know you a little better.",
+    "turn": "keep",
+    "conditions": [
+      {
+        "move": {
+          "agent": {
+            "id": 5
+          }
+        }
+      },
+      {
+        "move": {
+          "agent": {
+            "id": 6
+          }
+        }
+      },
+      {
+        "move": {
+          "agent": {
+            "id": 7
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": 9,
+    "intent": "question",
+    "content": "If there is one thing you want to do this weekend, what would it be?",
+    "turn": "assign",
+    "conditions": [
+      {
+        "move": {
+          "agent": {
+            "id": 8
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": 10,
+    "intent": "question",
+    "content": "Alright. Why do you like {{activity=that}}?",
+    "turn": "assign",
+    "conditions": [{
+        "move": {
+          "agent": {
+            "id" : 9
+          },
+          "user": {
+
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": 11,
+    "intent": "question",
+    "content": "If you could choose another activity, what would that be?",
+    "turn": "assign",
+    "conditions": [
+      {
+      "move": {
+        "agent": {
+          "id": 10
+        },
+        "user": {
+        }
+      }
+    }]
+  },
+  {
+    "id": 12,
+    "intent": "question",
+    "content": "What would you miss the most if you weren't able to do {{activity=that}}?",
+    "turn": "assign",
+    "conditions": [{
+      "move": {
+        "agent": {
+          "id": 11
+        },
+        "user": {
+        }
+      }
+    }
+      ]
+  },
+  {
+    "id": 13,
+    "intent": "question",
+    "content": "Looking at last week, which activity did you enjoy the most?",
+    "turn": "assign",
+    "conditions": [{
+      "move": {
+        "agent": {
+          "id": 12
+        },
+        "user": {
+        }
+      }
+    }
+      ]
+  },
+  {
+    "id": 14,
+    "intent" : "question",
+    "content": "Great! How does {{activity=that}} make you feel?",
+    "turn": "assign",
+    "conditions": [{
+      "move": {
+        "agent": {
+          "id": 13
+        },
+        "user": {
+        }
+      }
+    }
+      ]
+  },
+  {
+    "id": 15,
+    "intent": "question",
+    "content": "Thanks! That was it. Do you still think the same about me?",
+    "turn": "assign",
+    "conditions": [{
+      "move": {
+        "agent": {
+          "id": 14
+        },
+        "user": {
+        }
+      }
+    }
+      ]
+  },
+  {
+    "id": 16,
+    "intent": "valediction",
+    "content": "Thanks for participating! We hope you enjoyed it.",
+    "turn": "assign",
+    "conditions": [{
+      "move": {
+        "agent": {
+          "id": 15
+        },
+        "user": {
+
+        }
+      }
+    }
+      ]
+  }
+]

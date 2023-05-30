@@ -1,0 +1,142 @@
+[
+  {
+    "id": 1,
+    "intent": "greeting",
+    "keywords": {
+      "starts":["hello","good morning","good afternoon", "good evening","hi","hey","Coffeebot","CeeBee"]
+    }
+  },
+  {
+    "id": 4,
+    "intent" : "valediction",
+    "keywords": {
+      "exists": ["bye bye", "adios", "see you later", "bye-bye"],
+      "exactly":["bye","goodbye","see you","i have to go", "ciao", "stop talking"]
+    }
+  },
+  {
+    "id":8,
+    "intent":"repeat",
+    "keywords":{
+      "exactly":["what did you say", "sorry", "what"],
+      "exists": ["can you repeat","didn't understand what you are saying","did not understand what you are saying", "did not hear you", "didn't hear you", "say that again", "i don't understand", "i do not understand"]
+    }
+  },
+  {
+    "id" : 5,
+    "intent": "confirm",
+    "keywords": {
+      "exactly": ["yeah","sure","ok","indeed","yes","uhu","okay"],
+      "starts": ["yes"]
+    }
+  },
+  {
+    "id": 6,
+    "intent": "disconfirm",
+    "keywords": {
+      "exactly": ["no", "nope", "never", "not really"],
+      "starts":["no"]
+    }
+  },
+  {
+    "id": 7,
+    "intent": "stalling",
+    "keywords": {
+      "exactly" :["uhm","err","uh","so","it","i","oh"]
+    }
+  },
+  {
+    "id":9,
+    "intent":"backchannel",
+    "keywords":{
+      "exactly":["uhu","ok"]
+    }
+  },
+  {
+    "id" : 3,
+    "intent": "inform",
+    "keywords": []
+  },
+  {
+    "id": 2,
+    "intent": "question",
+    "keywords" : {
+      "starts":["what" ,"how","why","when","who","where","can","did","do","didn't","doesn't","aren't","are"]
+    }
+  },
+  {
+    "id": 10,
+    "intent": "pausing",
+    "interaction":{
+      "timeoutFrequency": "1"
+    }
+  },
+  {
+    "id": 11,
+    "intent": "contact",
+    "keywords": {
+      "exists":["i am here", "i'm here", "i am still here"]
+    }
+  },
+  {
+    "id": 12,
+    "intent": "assignTurn",
+    "keywords": {
+      "exists": ["go on","continue"]
+    }
+  },
+  {
+    "id": 13,
+    "intent": "keepTurn",
+    "keywords": {
+      "starts": ["wait","hold on"],
+      "exactly": ["that's a difficult question","let me think about it"]
+    }
+  },
+  {
+    "id": 14,
+    "intent": "answer",
+    "keywords": [],
+    "conditions": [
+      {
+        "move": {
+          "agent": {
+            "intent": "question",
+            "range": {
+              "min": 0,
+              "max": 1
+            }
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id":15,
+    "intent":"unknown",
+    "keywords":{
+      "exactly":["i don't know","continue"]
+    }
+  },
+  {
+    "id": 16,
+    "intent": "otherIntroduction",
+    "keywords": {
+      "exactly": ["what's your name","what is your name", "how are you called", "how should i call you"]
+    }
+  },
+  {
+    "id": 17,
+    "intent": "selfIntroduction",
+    "keywords": {
+      "starts": ["my name is"]
+    }
+  },
+  {
+    "id":18,
+    "intent": "thinking",
+    "keywords":{
+       "exists":["that's a difficult question","let me think","that's been a while","give me a minute"]
+    }
+  }
+]

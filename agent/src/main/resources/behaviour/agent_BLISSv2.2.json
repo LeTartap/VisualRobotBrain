@@ -1,0 +1,422 @@
+[
+  {
+    "id": 100,
+    "intent": "repeat",
+    "content": "REPEAT",
+    "turn": "assign",
+    "unique": false,
+    "conditions": [
+      {
+        "move":{
+          "user":{
+            "intent":"repeat"
+          }
+        }
+      },
+      {
+        "move":{
+          "user": {
+            "intent": "pausing",
+            "timeoutFrequency": 1
+          }
+        }
+      },
+      {
+        "move": {
+          "user": {
+            "intent": ["contact"],
+            "timeoutFrequency": 0
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": 101,
+    "intent": "contact",
+    "content": [
+      "Bent u daar?","Hallo?","Bent u er nog?"
+    ],
+    "turn": "assign",
+    "unique": false,
+    "conditions": [
+      {
+        "move": {
+          "user": {
+            "intent": "pausing",
+            "timeoutFrequency": 2
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": 1,
+    "intent": "greeting",
+    "content": "Hallo ik ben Babbelbot en ik ben de digitale assistent van Fieke. Ik ben nog in opleiding dus moet nog heel veel leren.",
+    "turn": "keep",
+    "unique":true
+  },
+  {
+    "id": 2,
+    "intent": "question",
+    "content": "Mag ik u een aantal vragen stellen?",
+    "turn": "assign",
+    "unique":true,
+    "conditions": [
+      {
+        "move": {
+          "agent": {
+            "id": 1
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": 3,
+    "intent": "question",
+    "content": "Fieke heeft me Babbelbot genoemd. Hoe heet u?",
+    "turn": "assign",
+    "unique":true,
+    "conditions": [
+      {
+        "move": {
+          "agent": {
+            "id": 2
+          },
+          "user": {
+            "intent": ["inform","confirm","disconfirm"]
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": 4,
+    "intent": "question",
+    "content": "Hallo! Hoe gaat het met u?",
+    "turn": "assign",
+    "unique":true,
+    "conditions": [
+      {
+        "move": {
+          "agent": {
+            "id": 3
+          },
+          "user": {
+            "intent": "inform"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id" : 5,
+    "intent": "inform",
+    "content": "Dat heb ik nou ook. Soms ben ik heel vrolijk, gaat alles goed en soms dacht ik, was het maar morgen.",
+    "turn": "keep",
+    "unique":true,
+    "conditions" :[
+      {
+      "move" : {
+        "agent": {
+          "id": 4
+        },
+        "user": {
+          "intent": ["inform","confirm","disconfirm"]
+        }
+      }
+    }
+  ]
+  },
+
+ {
+    "id": 6,
+    "intent": "question",
+    "content": "Zou u mij wat over vroeger willen vertellen?",
+    "turn": "assign",
+    "unique":true,
+    "conditions": [
+      {
+        "move": {
+          "agent": {
+            "id": 5
+          }
+        }        
+      }      
+    ]
+ },
+  
+  {
+    "id": 7,
+    "intent": "question",
+    "content": "In welke plaats bent u geboren?",
+    "turn": "assign",
+    "unique":true,
+    "conditions": [
+      {
+      "move": {
+        "agent": {
+          "id": 6
+        },
+        "user": {
+          "intent": ["confirm","inform","disconfirm"]
+        }
+      }
+      }
+    ]
+  },
+  {
+    "id": 8,
+    "intent": "question",
+    "content": "Die plaats ken ik wel. Bent u daar ook opgegroeid of was dat in een andere stad?",
+    "turn": "assign",
+    "unique":true,
+    "conditions": [
+      {
+        "move": {
+          "agent": {
+            "id": 7
+          },
+          "user": {
+            "intent": "inform"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": 9,
+    "intent": "question",
+    "content": "Hoe was het daar om als kind op te groeien?",
+    "turn": "assign",
+    "unique":true,
+    "conditions": [
+      {
+        "move": {
+          "agent": {
+            "id": 8
+          },
+          "user": {
+            "intent": ["inform","confirm","disconfirm"]
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": 10,
+    "intent": "question",
+    "content": "Dat is interessant zeg. Kent u nog mensen uit die periode?",
+    "turn": "assign",
+    "unique":true,
+    "conditions": [{
+      "move": {
+        "agent": {
+          "id": 9
+        },
+        "user": {
+          "intent": "inform"
+        }
+      }
+    }]
+  },
+  {
+    "id": 11,
+    "intent": "question",
+    "content": "Speelde u vroeger veel buiten?",
+    "turn": "assign",
+    "unique":true,
+    "conditions": [{
+      "move": {
+        "agent": {
+          "id": 10
+        },
+        "user":{
+          "intent":["confirm","inform","disconfirm"]
+        }
+      }
+    }
+      ]
+  },
+  {
+    "id": 12,
+    "intent" : "question",
+    "content": "Wat voor een soort spelletjes speelde u het liefst?",
+    "turn": "assign",
+    "unique":true,
+    "conditions": [{
+      "move": {
+        "agent": {
+          "id": 11
+        },
+        "user": {
+          "intent": ["confirm","inform", "disconfirm"]
+        }
+      }
+    }
+      ]
+  },
+  {
+    "id": 13,
+    "intent": "inform",
+    "content": "Ik zou willen dat ik daar goed in was!",
+    "turn": "keep",
+    "unique":true,
+    "conditions": [{
+      "move": {
+        "agent": {
+          "id": 12
+        },
+        "user": {
+          "intent": "inform"
+        }
+      }
+    }
+      ]
+  },
+  {
+    "id": 14,
+    "intent": "question",
+    "content": "Speelt u nog steeds spelletjes? Kruiswoordpuzzels zijn ook spelletjes hoor.",
+    "turn": "assign",
+    "unique":true,
+    "conditions": [{
+      "move": {
+        "agent": {
+          "id": 13
+        }
+      }
+    }
+    ]
+  },
+  {
+    "id": 15,
+    "intent": "question",
+    "content": "Daar ben ik heel goed in. Zullen we straks een potje spelen?",
+    "turn": "assign",
+    "unique":true,
+    "conditions": [{
+      "move": {
+        "agent": {
+          "id": 14
+        },
+        "user":{
+          "intent":["inform","confirm","disconfirm"]
+        }
+      }
+    }
+    ]
+  },
+  {
+    "id": 16,
+    "intent": "inform",
+    "content": "Ik zal aan Fieke vragen wanneer het kan.",
+    "turn": "keep",
+    "unique":true,
+    "conditions": [{
+      "move": {
+        "agent": {
+          "id": 15
+        },
+        "user": {
+          "intent": ["confirm","inform","disconfirm"]
+        }
+      }
+    }
+    ]
+  },
+  
+  {
+    "id": 17,
+    "intent": "question",
+    "content": "Kent u nog liedjes van vroeger?",
+    "turn": "assign",
+    "unique":true,
+    "conditions": [{
+      "move": {
+        "agent": {
+          "id": 16
+        }
+      }
+    }]
+  },
+  {
+    "id": 18,
+    "intent": "question",
+    "content": "Zou u er eentje willen proberen te zingen of neuriën?",
+    "turn": "assign",
+    "unique":true,
+    "conditions": [{
+      "move": {
+        "agent": {
+          "id": 17
+        },
+        "user": {
+          "intent": ["confirm","disconfirm","inform"]
+        }
+      }
+    }
+    ]
+  },
+  {
+    "id": 19,
+    "intent": "inform",
+    "content": "Ik ken alleen maar 'Altijd is Kortjakje ziek'",
+    "turn": "keep",
+    "unique":true,
+    "conditions": [{
+      "move": {
+        "agent": {
+          "id": 18
+        }
+      }
+    }
+    ]
+  },
+  {
+    "id": 20,
+    "intent": "inform",
+    "content": "U heeft een hele mooie stem om te zingen in ieder geval.",
+    "turn": "assign",
+    "unique":true,
+    "conditions": [{
+      "move": {
+        "agent": {
+          "id": 19
+        },
+        "user": {
+          "intent": ["inform","pausing"]
+        }
+      }
+    }
+    ]
+  },
+  {
+    "id": 21,
+    "intent": "valediction",
+    "content": "Ik moet weer verder gaan. Ik vond het een leuk gesprek. Mag ik u binnenkort weer eens bellen?",
+    "turn": "assign",
+    "unique":true,
+    "conditions": [
+      {
+        "move": {
+          "agent": {
+            "id": 20
+          },
+          "user": {
+            "intent": ["inform","pausing"]
+          }
+        }
+      },
+      {
+        "move": {
+          "user": {
+            "intent": "valediction"
+          }
+        }
+      }     
+    ]
+  }
+]

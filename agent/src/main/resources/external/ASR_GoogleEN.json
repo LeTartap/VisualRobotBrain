@@ -1,0 +1,17 @@
+{
+  "middleware": {
+    "loaderClass": "nl.utwente.hmi.middleware.activemq.ActiveMQMiddlewareLoader",
+    "properties": {
+      "iTopic": "BLISS/out",
+      "oTopic": "BLISS/in",
+      "amqBrokerURI": "tcp://localhost:61616"
+    }
+  },
+  "interpreter": {
+    "type": "Google",
+    "properties": {
+      "languageCode": "en-US"
+    }
+  }
+
+}

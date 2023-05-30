@@ -1,0 +1,1 @@
+./agent/gradlew -b ./agent/build.gradle -PmainClass=nl.bliss.external.tts.SimpleMWTTS runApp --args="-file external/TTS.json"

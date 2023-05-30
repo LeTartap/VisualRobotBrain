@@ -1,0 +1,12 @@
+{
+  "speak": {
+    "version": "1.1",
+    "xml:lang": "nl_nl",
+    "name": "Guus",
+    "rate": "normal",
+    "pitch": "+0%",
+    "src": "file:consent2",
+    "speed": "100%",
+    "text": "hello"
+  }
+}

@@ -1,0 +1,113 @@
+# Author: Jelte van Waterschoot
+# Group: Human Media Interaction, University of Twente
+# Contact: j.b.vanwaterschoot@utwente.nl
+
+? SET {'title':'Babbelbot'}
+#Profile of the user we want to save to firebase
+# ? userdata = FETCH name, birthyear, birthplace, childhoodplace, old_games, new_games
+
+? IF bliss_data:profile = NULL
+    ? INSERT BLOCK:bliss_data:resetData
+    ? INSERT BLOCK:bliss_shared:resetData
+    ? INSERT BLOCK:bliss_secrets:resetData
+
+# Self-disclose if 1 or not if 0
+# Self = babbelbot, other = user
+
+? IF bliss_data:profile['name'] != NULL
+    ? bliss_shared:text = "Welkom terug, " +bliss_data:profile['name']    
+    ? INSERT BLOCK:bliss_shared:speakTextWithEmphasis
+    ? bliss_shared:text = "Wilt u uw data verwijderen?"
+    ? INSERT BLOCK:bliss_shared:speakTextWithEmphasis
+    ? ASK ANSWER
+        > Ja
+            ? intent = "affirm"            
+            ? INSERT BLOCK:bliss_data:resetData
+        > Nee
+            ? intent = "deny"            
+    ? bliss_data:profile['log'] := {'other': {'intent':intent}}
+? ELSE
+    ? bliss_shared:text = "Hallo, ik ben de digitale assistent van BLISS. Ik ben nog in opleiding dus moet nog heel veel leren."
+    ? INSERT BLOCK:bliss_shared:speakTextWithEmphasis
+
+? bliss_shared:text = "Mag ik u een aantal vragen stellen?"
+? INSERT BLOCK:bliss_shared:speakTextWithEmphasis
+? ASK ANSWER
+    > Ja
+        ? intent = "affirm"        
+    > Nee
+        ? intent = "deny"
+? bliss_data:profile['log'] := {'other': {'intent':intent}}
+
+# Once we have RASA server running, we can use RASA for intent classification and/or NLG generation
+# ? INSERT BLOCK:bliss_shared:getASRTranscript
+# ? transcript = bliss_shared:reply['hypotheses'][0]['utterance']
+# Jouw antwoord: <<transcript>>
+
+# ? bliss_shared:text = transcript
+# ? INSERT BLOCK:bliss_shared:getRASAIntent
+# ? intent = bliss_shared:reply['body']['intent']['name']
+# Jouw intentie: <<intent>>
+
+? IF intent != NULL
+    ? IF intent = "affirm"
+        ? _counter = 2
+        ? bliss_shared:text = "Okay, leuk!"
+        ? INSERT BLOCK:bliss_shared:speakTextWithEmphasis
+        ? WHILE _counter != 0
+            ? _key = "name"
+            ? bliss_shared:index = 0
+            ? IF bliss_data:profile[_key] = NULL
+                ? INSERT BLOCK:bliss_shared:question
+                ? bliss_shared:text = bliss_shared:reply[_key]
+                ? INSERT BLOCK:bliss_shared:speakTextWithEmphasis                
+                ? bliss_data:profile[_key] = ASK TEXT
+                ? bliss_data:profile['log'] := {'other': {'text':bliss_data:profile[_key]}}
+                ? bliss_shared:text = "Aangenaam kennis te maken, "+ bliss_data:profile[_key]
+                ? INSERT BLOCK:bliss_shared:speakTextWithEmphasis                
+                ? bliss_shared:index = 0
+                ? INSERT BLOCK:bliss_shared:selfdisclose
+                ? bliss_shared:text = bliss_shared:reply[_key]
+                ? INSERT BLOCK:bliss_shared:speakTextWithEmphasis                
+            ? ELSE
+                ? _askQuestion = 1
+                ? _max_tries = 20
+                # Choose question
+                ? WHILE _askQuestion = 1 AND _max_tries > 0
+                    ? bliss_shared:index = NOW % 5 + 1                    
+                    ? _keys = KEYS bliss_data:profile
+                    ? _key = _keys[bliss_shared:index]
+                    ? IF bliss_data:profile[_key] = NULL
+                        ? _askQuestion = 0                                    
+                        ? INSERT BLOCK:bliss_shared:question                                                                                          
+                        ? bliss_shared:text = bliss_shared:reply[_key]
+                        ? INSERT BLOCK:bliss_shared:speakTextWithEmphasis
+                        ? INSERT BLOCK:bliss_shared:getASRTranscript                            
+                        ? bliss_data:profile[_key] = bliss_shared:reply['hypotheses'][0]['utterance']
+                        ? IF bliss_data:profile['sd'] = 1
+                            ? INSERT BLOCK:bliss_shared:selfdisclose
+                            ? bliss_shared:text = bliss_shared:reply[_key]
+                            ? INSERT BLOCK:bliss_shared:speakTextWithEmphasis                          
+                    ? ELSE
+                        ? _max_tries = _max_tries - 1
+            ? _counter = _counter - 1        
+        ? bliss_shared:text = "Ik moet weer verder gaan. Ik vond het een leuk gesprek."
+        ? INSERT BLOCK:bliss_shared:speakTextWithEmphasis
+    ? IF intent = "deny"        
+        ? bliss_shared:text = "Jammer, andere keer dan."
+        ? INSERT BLOCK:bliss_shared:speakTextWithEmphasis                        
+
+? bliss_shared:text = "Mag ik u binnenkort nog eens spreken?"
+? INSERT BLOCK:bliss_shared:speakTextWithEmphasis                        
+? ASK ANSWER
+    > Misschien
+        ? intent = "doubt"
+        ? bliss_shared:text = "Ik zal nog beter m'n best doen om het leuker te maken!"
+    > Ja
+        ? intent = "affirm"
+        ? bliss_shared:text = "Leuk, tot de volgende keer!"
+    > Nee
+        ? intent = "deny"
+        ? bliss_shared:text = "Oei, jammer. Mocht u zich bedenken kunt u altijd met mijn baas contact opnemen."
+? bliss_data:profile['log'] := {'other': {'intent':intent}}
+? INSERT BLOCK:bliss_shared:speakTextWithEmphasis

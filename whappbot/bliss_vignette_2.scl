@@ -1,0 +1,482 @@
+# Author: Jelte van Waterschoot
+# Group: Human Media Interaction, University of Twente
+# Contact: j.b.vanwaterschoot@utwente.nl
+
+? SET {'title':'Babbelbot'}
+#Profile of the user we want to save to firebase
+# ? userdata = FETCH name, birthyear, birthplace, childhoodplace, old_games, new_games
+
+? IF bliss_data_sd:profile = NULL
+    ? INSERT BLOCK:bliss_data_sd:resetData
+    ? INSERT BLOCK:bliss_shared:resetData
+    ? INSERT BLOCK:bliss_secrets:resetData
+
+? topics = [{"id":7327,"name":"Gezelschapsspelen, kaart- en bordspelen overig"},{"id":7310,"name":"Individuele spelletjes, ongespecificeerd"},{"id":7331,"name":"Computer spelen, games offline"},{"id":3430,"name":"Huisdieren verzorgen"},{"id":4000,"name":"Vrijwilligerswerk"},{"id":5120,"name":"Op visite gaan en visite krijgen, ongespecificeerd"}]
+? followupTopics = [{"id":5100,"name":"Social -overig"},{"id":4114,"name":"Activiteiten tijdsbesteding"}]
+? pets = ["kip","poes","hond","kat","egel","geit","toer","steenbok","muis","gerbil","renmuis","grasmuis","kangoeroe","wallabie","konijn","rat", "cavia","hamster","nerts","paard","ezel","varken","rund","waterbuffel","damhert","edelhert","schaap","vis","vogel","duif","poes","fret","chinchilla","parkiet","papegaai","kaketoe","ara","valk","roofvogel","slang","schildpad","salamander","leguaan","eend","gans",    "Labradoodle","Labrador","retriever","chihuahua","bulldog","terrier","teckel","poedel","beagle","herder","rottweiler"]
+? family = ["man", "vrouw","partner", "ouder","vader","moeder","schoonouder", "kind", "kinders", "schoonzoon", "schoondochter", "broer", "broers","zus", "kleindochter", "kleinzoon", "kleinkind", "opa", "oma","grootouder", "schoonzus", "zwager", "zwageres", "stiefzus", "stiefbroer", "oom", "tante", "neef", "nicht", "overgrootouder", "achterkleinkind", "echtgenoot", "echtgenote", "stiefmoeder", "stiefvader"]
+
+# CONFIGURATION
+# Reset?
+# ? INSERT BLOCK:bliss_data_sd:resetData
+# Record audio?
+? bliss_shared:record = 1
+# Speak with emphasis?
+#? bliss_shared:emphasis = 1
+# Show user transcript?
+? bliss_shared:user_speech = 1
+# Show agent transcript?
+#? bliss_shared:agent_speech = 1
+
+#######################################################
+# START OF DIALOGUE
+#######################################################
+
+? bliss_shared:text = 'Dit is een demo van het BLISS project, waarbij je een gesprek gaat voeren met een gesproken agent over geluk. We hebben een <a href="https://drive.google.com/file/d/1p2tc28B8GfqOsXdNV6KuEDpU7-i5qClp/view" target="_blank">informatiebrochure</a> die verder in gaat op de details van deze demo en heeft voorbeelden van de vragen die gesteld worden. Wil je alsjeblieft het <a href="https://forms.office.com/r/tqg5f58yjC" target="_blank">toestemmingsformulier</a> invullen voordat je verder gaat?'
+<<bliss_shared:text>>
+# ? info = ASK URL {'url': 'https://forms.office.com/r/tqg5f58yjC', 'target':'_blank'}
+
+? bliss_shared:text = "Heb je (al) toestemming gegeven op het formulier?"
+<<bliss_shared:text>>
+? ASK ANSWER
+    > Ja
+        ? consent = 1
+        ? bliss_shared:text = "Dankjewel. Dan starten we nu de conversatie van de demo."
+        <<bliss_shared:text>>
+        ? bliss_shared:text = "Voor sommige antwoorden moet je je eigen stem opnemen. Druk hiervoor op de blauwe knop met het microfoontje." 
+        <<bliss_shared:text>>
+        ? bliss_shared:text = "Als je klaar bent met opnemen, kun je op de groene knop met het vinkje drukken om de opname te verzenden."
+        <<bliss_shared:text>>
+        ? bliss_shared:text = "Ben je niet tevreden met wat je hebt opgenomen? Druk dan op het rode kruisje en de opname stopt. Je kunt hierna weer een nieuwe opname starten."
+    > Nee
+        ? consent = 0
+        ? bliss_shared:text = "Helaas, dan kun je niet meedoen aan de demo."
+<<bliss_shared:text>>
+
+
+? IF consent = 1
+
+    ? SET {'delay': 2000}
+    # Check if they want another go if all questions are asked
+    ? IF LENGTH bliss_data_sd:profile["ids"] > 0
+        ? bliss_shared:text = "We hebben al eerder gesproken! Wil je opnieuw starten?"
+        <<bliss_shared:text>>
+        ? ASK ANSWER
+            > Ja
+                ? INSERT BLOCK:bliss_data_sd:resetData
+                ? bliss_shared:text = "Ok! Dan beginnen we van voor af aan."
+                <<bliss_shared:text>>
+            > Nee
+                ? bliss_shared:text = "Geen probleem, dan gaan we verder."                
+                <<bliss_shared:text>>
+
+    # Introduction
+    ? IF bliss_data_sd:profile['name'] != NULL
+        ? bliss_data_sd:profile['past_interactions'] = bliss_data_sd:profile['past_interactions'] + 1
+        ? bliss_shared:text = "Welkom terug, " +bliss_data_sd:profile['name']            
+        ? INSERT BLOCK:bliss_shared:speakTextWithEmphasis        
+    ? ELSE
+        ? bliss_shared:text = "Hallo, ik ben Babbelbot en ik zou graag even met je willen praten."
+        ? INSERT BLOCK:bliss_shared:speakTextWithEmphasis
+        ? bliss_shared:text = "Het is de bedoeling dat ik meer leer over het geluk en welzijn van mensen."
+        ? INSERT BLOCK:bliss_shared:speakTextWithEmphasis
+        ? bliss_shared:text = "Ik zou daarom graag met je praten over waar je je goed bij voelt."        
+        ? INSERT BLOCK:bliss_shared:speakTextWithEmphasis
+        ? bliss_shared:text = "Wat is je naam?"
+        ? INSERT BLOCK:bliss_shared:speakTextWithEmphasis
+        ? bliss_data_sd:profile['name'] = ASK TEXT    
+    ? bliss_shared:text = "Hoe gaat het?"
+    ? INSERT BLOCK:bliss_shared:speakTextWithEmphasis    
+    ? INSERT BLOCK:bliss_shared:getASRTranscript
+    ? bliss_shared:text = bliss_shared:reply['hypotheses'][0]['utterance']
+    ? INSERT BLOCK:bliss_shared:getRASANLU
+    ? _intent = bliss_shared:reply['user_input']['intent']['name']    
+    # <<_intent>>
+    ? IF _intent = "mood_great"
+        ? bliss_shared:text = "Dat is fijn om te horen."
+        ? INSERT BLOCK:bliss_shared:speakTextWithEmphasis
+    ? ELSEIF _intent = "mood_unhappy"
+        ? bliss_shared:text = "Dat spijt me om te horen."
+        ? INSERT BLOCK:bliss_shared:speakTextWithEmphasis
+    ? bliss_data_sd:profile['log'] := {'other': {'intent':_intent}}       
+    
+    # Opening question
+    ? INSERT BLOCK:openEvent
+
+    # Go through previous topic sequences + two new topics
+    ? IF bliss_data_sd:profile["past_interactions"] > 1
+        ? _characteristics_names = KEYS bliss_data_sd:profile["characteristics"]
+        ? _hond = _characteristics_names FIND THIS = "hond"
+        ? IF _hond != NULL
+            ? bliss_shared:text = "In het vorige gesprek vertelde je dat je een hond hebt. Ben jij degene die het vaakst met de hond gaat wandelen?"
+            ? INSERT BLOCK:bliss_shared:speakTextWithEmphasis
+            ? INSERT BLOCK:bliss_shared:getASRTranscript
+        ? _pet = _characteristics_names FIND THIS = "pet"
+        ? IF _pet != NULL
+            ? IF _hond = NULL
+                ? bliss_shared:text = "Je zei dat je een "+bliss_data_sd:profile["characteristics"]["pet"]+" hebt. Zou je in de toekomst ook andere huisdieren nemen?"
+            ? ELSE
+                ? bliss_shared:text = "Zou je in de toekomst ook andere huisdieren nemen?"
+            ? INSERT BLOCK:bliss_shared:speakTextWithEmphasis
+            ? INSERT BLOCK:bliss_shared:getASRTranscript
+        ? _game = _characteristics_names FIND THIS = "game"
+        ? IF _game != NULL
+            ? IF bliss_data_sd:profile["characteristics"]["game"] = 1
+                ? bliss_shared:text = "Je noemde de vorige keer dat je wel eens een gezelschapsspelletje speelt, heb je dat de afgelopen tijd gedaan?"            
+                ? INSERT BLOCK:bliss_shared:speakTextWithEmphasis
+                ? INSERT BLOCK:bliss_shared:getASRTranscript
+        ? INSERT BLOCK:5100
+        ? INSERT BLOCK:4114
+        
+    # Loop through all topic sequences in random order
+    ? WHILE LENGTH bliss_data_sd:profile["ids"] < LENGTH topics
+        ? INSERT BLOCK:selectTopic
+        ? IF topic["id"] = 3430
+            ? INSERT BLOCK:3430
+        ? IF topic["id"] = 4000
+            ? INSERT BLOCK:4000
+        ? IF topic["id"] = 5120
+            ? INSERT BLOCK:5120
+        ? IF topic["id"] = 7310
+            ? INSERT BLOCK:7310
+        ? IF topic["id"] = 7327
+            ? INSERT BLOCK:7327
+        ? IF topic["id"] = 7331
+            ? INSERT BLOCK:7331
+    
+    # Wrapping up the dialogue
+    ? bliss_shared:text = "Dat was het voor deze keer! Van harte bedankt! Wat vond je van het gesprek?"
+    ? INSERT BLOCK:bliss_shared:speakTextWithEmphasis
+    ? ASK ANSWER
+        > Wel oké
+            ? intent = "doubt"
+            ? bliss_shared:text = "Ik zal nog beter m'n best doen om het leuker te maken! Tot ziens!"
+        > Heel leuk
+            ? intent = "affirm"
+            ? bliss_shared:text = "Leuk, tot de volgende keer!"
+        > Niet heel interessant
+            ? intent = "deny"
+            ? bliss_shared:text = "Oei, jammer... Ik hoop dat je me nog een nieuwe kans geeft in de toekomst. Tot snel!"
+        > Slecht
+            ? intent = "deny"
+            ? bliss_shared:text = "Oei, jammer... Ik hoop dat je me nog een nieuwe kans geeft in de toekomst. Tot snel!"
+    ? bliss_data_sd:profile['log'] := {'other': {'intent':intent}}
+    ? INSERT BLOCK:bliss_shared:speakTextWithEmphasis
+
+#######################################################
+# END OF DIALOGUE
+#######################################################
+
+# State a random opening question
+? BLOCK openEvent
+
+    ? _open_questions = ["Heb je deze week iets leuks meegemaakt?","Heb je afgelopen tijd iets nieuws gedaan?","Heb je wat nieuwtjes te vertellen?"]
+    ? _open_question = _open_questions[NOW % LENGTH _open_questions]
+    ? bliss_shared:text = _open_question
+    ? INSERT BLOCK:bliss_shared:speakTextWithEmphasis
+    ? INSERT BLOCK:bliss_shared:getASRTranscript
+    ? bliss_shared:text = bliss_shared:reply['hypotheses'][0]['utterance']
+    ? INSERT BLOCK:bliss_shared:numberOfWords
+    ? _number_of_words = bliss_shared:reply['words']
+    ? IF _number_of_words = NULL OR _number_of_words <= 3
+        ? bliss_shared:text = "Oké."
+    ? ELSE
+        ? bliss_shared:text = "Dat is interessant!"
+    ? INSERT BLOCK:bliss_shared:speakTextWithEmphasis
+
+
+# Bron: Alle ballen in de lucht, Tijdsbesteding in Nederland en de samenhang met kwaliteit van leven.
+# Auteur: Anne Roeters (redactie).
+# Sociaal en Cultureel Planbureau
+# December 2018
+# ISBN/ISSN/anders: 978 90 377 0899 8.
+# Volgnummer 2018-34.
+
+# Select a topic randomly, but not previously from the list of the CBS vrijetijdsbesteding. Reset if max items has been reached.
+? BLOCK selectTopic
+    # ? IF LENGTH bliss_data_sd:profile["ids"] >= LENGTH topics
+    #     ? bliss_data_sd:profile["ids"] = []
+    ? topic = topics[NOW % LENGTH topics]
+    ? _id = topic["id"]
+    ? _existing_topic = bliss_data_sd:profile["ids"] FIND THIS = _id
+    ? IF _existing_topic != NULL
+        ? WHILE _existing_topic != NULL
+            ? topic = topics[NOW % LENGTH topics]
+            ? _id = topic["id"]
+            ? _existing_topic = bliss_data_sd:profile["ids"] FIND THIS = _id
+    ? bliss_data_sd:profile["ids"] = FLAT [bliss_data_sd:profile["ids"],_id]
+    # ? ids = STRINGIFY bliss_data_sd:profile["ids"]
+    # ? text = "IDS in database: " + ids
+    # <<text>>
+
+? BLOCK checkPets
+    ? _indexNPS = 0
+    ? noKnownPet = 1
+    ? pet = "dat"
+    ? WHILE _indexNPS < LENGTH nps AND noKnownPet = 1
+        ? noKnownPet = pets FIND THIS = nps[_indexNPS]
+        ? IF noKnownPet != NULL
+            ? pet = nps[_indexNPS]
+            ? noKnownPet = 0
+        ? _indexNPS = _indexNPS + 1
+
+? BLOCK checkFamily
+    ? _indexNPS = 0
+    ? noKnownFamily = 1
+    ? familyMember = "die"
+    ? WHILE _indexNPS < LENGTH nps AND noKnownFamily = 1
+        ? noKnownFamily = family FIND THIS = nps[_indexNPS]
+        ? IF noKnownFamily != NULL
+            ? familyMember = nps[_indexNPS]
+            ? noKnownFamily = 0
+        ? _indexNPS = _indexNPS + 1
+
+
+# 3430 sequence
+? BLOCK 3430
+    ? _sd = NOW % 2
+    ? IF _sd = 0
+        ? bliss_shared:text = "Heb je huisdieren?"
+        ? INSERT BLOCK:bliss_shared:speakTextWithEmphasis
+        ? ASK ANSWER
+            > Ja / Gehad
+                ? intent = "affirm"                
+                ? bliss_shared:text = "Welk huisdier?"
+                ? INSERT BLOCK:bliss_shared:speakTextWithEmphasis
+                ? INSERT BLOCK:bliss_shared:getASRTranscript
+                ? bliss_shared:text = bliss_shared:reply['hypotheses'][0]['utterance']
+                ? INSERT BLOCK:bliss_shared:getNPS
+                ? nps = bliss_shared:reply["chunks"]
+                ? IF nps = NULL OR LENGTH nps = 0
+                    ? pet = "dat"
+                ? ELSE
+                    ? INSERT BLOCK:checkPets
+                ? IF pet = "hond"
+                    ? bliss_data_sd:profile["characteristics"]["hond"] = 1
+                ? IF noKnownPet = 0
+                    ? bliss_shared:text = "Waarom is het zo leuk om een " +pet+ " als huisdier te hebben?"                
+                    ? bliss_data_sd:profile["characteristics"]["pet"] = pet
+                ? ELSE
+                    ? bliss_shared:text = "Vertel daar eens iets meer over."
+
+            > Nee
+                ? intent = "deny"
+                ? bliss_shared:text = "Zou je overwegen om in de toekomst een huisdier te hebben?"
+        ? INSERT BLOCK:bliss_shared:speakTextWithEmphasis
+        ? INSERT BLOCK:bliss_shared:getASRTranscript
+    ? ELSE
+        ? bliss_shared:text = "Als Babbelbot praat ik niet alleen met mensen, maar ik lees regelmatig de online krantenberichten om een beetje bij te blijven. Zo las ik laatst een bericht dat dankzij de coronacrisis de kip superpopulair is als huisdier! Heb je huisdieren?"
+        ? INSERT BLOCK:bliss_shared:speakTextWithEmphasis
+        ? ASK ANSWER
+            > Ja / Gehad
+                ? intent = "affirm"
+                ? bliss_shared:text = "Welk huisdier?"
+                ? INSERT BLOCK:bliss_shared:speakTextWithEmphasis
+                ? INSERT BLOCK:bliss_shared:getASRTranscript
+                ? bliss_shared:text = bliss_shared:reply['hypotheses'][0]['utterance']
+                ? INSERT BLOCK:bliss_shared:getNPS
+                ? nps = bliss_shared:reply["chunks"]
+                ? IF nps = NULL OR LENGTH nps = 0
+                    ? pet = "dat"
+                ? ELSE
+                    ? INSERT BLOCK:checkPets
+                ? IF noKnownPet = 0
+                    ? bliss_shared:text = "Waarom is het zo leuk om een " +pet+ " als huisdier te hebben?"
+                    ? bliss_data_sd:profile["characteristics"]["pet"] = pet
+                ? ELSE
+                    ? bliss_shared:text = "Vertel daar eens iets meer over."
+            > Nee
+                ? intent = "deny"
+                ? bliss_shared:text = "Zou je je kunnen voorstellen dat je een kip als huisdier zou hebben?"
+        ? INSERT BLOCK:bliss_shared:speakTextWithEmphasis
+        ? INSERT BLOCK:bliss_shared:getASRTranscript
+
+# 4000 sequence
+? BLOCK 4000
+    ? _sd = NOW % 2
+    ? IF _sd = 0
+        ? bliss_shared:text = "Doe je ook vrijwilligerswerk of help je wel eens iemand?"
+        ? INSERT BLOCK:bliss_shared:speakTextWithEmphasis
+        ? INSERT BLOCK:bliss_shared:getASRTranscript
+    ? ELSE
+        ? bliss_shared:text = "Ik zou even met je willen praten over het doen van vrijwilligerswerk. Dan denk je misschien al meteen aan helpen in de soepkeuken van het Leger des Heils. Maar ook juist kleine dingen zoals een keer een boodschap meenemen voor de buurvrouw of de afvalcontainers aan straat zetten tellen ook mee. Wie help je wel eens?"
+        ? INSERT BLOCK:bliss_shared:speakTextWithEmphasis
+        ? INSERT BLOCK:bliss_shared:getASRTranscript
+
+        # Check if not dog or home is mentioned already
+        ? bliss_shared:text = bliss_shared:reply['hypotheses'][0]['utterance']
+        ? INSERT BLOCK:bliss_shared:getNPS
+        ? nps = bliss_shared:reply["chunks"]
+        ? IF nps = NULL OR LENGTH nps = 0
+            ? bliss_shared:text = "Laat je wel eens de hond uit voor iemand of pas je wel eens op het huis als mensen op vakantie gaan?"
+        ? ELSE
+            ? _dog = bliss_shared:reply["chunks"] FIND THIS = "hond"
+            ? _home = bliss_shared:reply["chunks"] FIND THIS = "huis"
+            ? IF _dog = NULL AND _home = NULL
+                ? bliss_shared:text = "Laat je wel eens de hond uit voor iemand of pas je wel eens op het huis als mensen op vakantie gaan?"
+        ? INSERT BLOCK:bliss_shared:speakTextWithEmphasis
+        ? INSERT BLOCK:bliss_shared:getASRTranscript
+    ? bliss_shared:text = "Ben je een beetje handig in klussen binnen of buitenshuis?"
+    ? INSERT BLOCK:bliss_shared:speakTextWithEmphasis
+    ? ASK ANSWER
+        > Ja
+            ? intent = "affirm"
+        > Nee
+            ? intent = "deny"
+    ? IF intent = "affirm"
+        ? bliss_shared:text = "Doe je dat wel eens voor iemand anders?"
+    ? ELSE
+        ? bliss_shared:text = "Ben je wel handig met computers.."
+    ? INSERT BLOCK:bliss_shared:speakTextWithEmphasis
+    ? INSERT BLOCK:bliss_shared:getASRTranscript
+
+# 5120
+? BLOCK 5120
+    ? _sd = NOW % 2
+    ? IF _sd = 0
+        ? _5120_varations = ["Bij wie ben je recent op bezoek geweest?","Dan even over op visite gaan, naar wie ben je van plan binnenkort op bezoek te gaan?","Krijg je binnenkort visite langs?"]
+        ? bliss_shared:text = _5120_varations[NOW % LENGTH _5120_varations]
+    ? ELSE
+        ? bliss_shared:text = "Eindelijk hoeven mensen nu niet meer altijd een mondkapje op en mogen mensen weer gewoon bij elkaar op bezoek. Daar kijken mensen al een hele tijd weer naar uit. Bij wie ben je recent op bezoek geweest?"
+    ? INSERT BLOCK:bliss_shared:speakTextWithEmphasis
+    ? INSERT BLOCK:bliss_shared:getASRTranscript
+
+# 7310 sequence
+? BLOCK 7310
+    ? _sd = NOW % 2
+    ? IF _sd = 0
+        ? bliss_shared:text = "Speel je zelf vaak alleen een spelletje zoals patience, het maken van een puzzel of het doen van kruiswoordpuzzels?"
+    ? ELSE
+        ? bliss_shared:text = "Als computer speel ik graag spelletjes tegen mezelf, mijn grote voorbeeld is mijn voorganger DeepBlue. Je weet wel, het schaakprogramma dat won van schaakgrootmeester Kasparov. Speel je zelf vaak alleen een spelletje zoals patience, het maken van een puzzel of het doen van kruiswoordpuzzels?"
+    ? INSERT BLOCK:bliss_shared:speakTextWithEmphasis
+    ? INSERT BLOCK:bliss_shared:getASRTranscript
+
+# 7327 sequence
+? BLOCK 7327
+    ? _sd = NOW % 2
+    ? IF _sd = 0
+        ? bliss_shared:text = "Vind je het leuk om gezelschapsspelletjes te spelen?"
+    ? ELSE
+        ? bliss_shared:text = "Laatst sprak ik met iemand die vertelde dat ze graag WordFeud speelt, dat is een soort digitale variant van Scrabble. Vind je het leuk ook om gezelschapsspelletjes te spelen?"
+    ? INSERT BLOCK:bliss_shared:speakTextWithEmphasis
+    ? ASK ANSWER
+        > Ja
+            ? intent = "affirm"
+            ? bliss_data_sd:profile["characteristics"]["game"] = 1
+        > Nee
+            ? intent = "deny"
+            ? bliss_data_sd:profile["characteristics"]["game"] = 0
+    ? IF _sd = 1
+        ? IF intent = "affirm"
+            ? bliss_shared:text = "Welk gezelschapsspel speel je graag?"
+            ? INSERT BLOCK:bliss_shared:speakTextWithEmphasis
+            ? INSERT BLOCK:bliss_shared:getASRTranscript
+
+    ? ELSE
+        ? IF intent = "affirm"
+            ? bliss_shared:text = "Welk gezelschapsspel speel je graag?"
+            ? INSERT BLOCK:bliss_shared:speakTextWithEmphasis
+            ? INSERT BLOCK:bliss_shared:getASRTranscript
+
+
+# 7331 sequence
+? BLOCK 7331
+    ? _sd = NOW % 2
+    ? IF _sd = 0
+        ? bliss_shared:text = "Speel je graag games op de computer?"
+    ? ELSE
+        ? bliss_shared:text = "Als ik met iemand spreek die onder de dertig is, dan krijg ik tegenwoordig heel vaak als antwoord dat ze graag op de computer gamen, meestal met vrienden. Vind je dat ook leuk om te doen?"
+    ? INSERT BLOCK:bliss_shared:speakTextWithEmphasis
+    ? INSERT BLOCK:bliss_shared:getASRTranscript
+
+# 5100 sequence
+? BLOCK 5100
+    ? bliss_shared:text = "Dan zou ik graag eens met je willen praten over mensen die belangrijk zijn in je leven."
+    ? INSERT BLOCK:bliss_shared:speakTextWithEmphasis
+    ? bliss_shared:text = "Als je dan aan je familie denkt, wie is dan de eerste die in je gedachte opkomt?"
+    ? INSERT BLOCK:bliss_shared:speakTextWithEmphasis
+    ? INSERT BLOCK:bliss_shared:getASRTranscript    
+    ? bliss_shared:text = bliss_shared:reply['hypotheses'][0]['utterance']
+    ? INSERT BLOCK:bliss_shared:getNPS
+    ? nps = bliss_shared:reply["chunks"]
+    ? IF nps = NULL OR LENGTH nps = 0
+        ? familyMember = "die"
+    ? ELSE
+        ? INSERT BLOCK:checkFamily
+    ? _sd = NOW % 2
+    ? IF _sd = 0
+        ? IF familyMember = "die"
+            ? bliss_shared:text = "Wat betekent die persoon voor jou?"
+        ? ELSEIF noKnownFamily = 0                
+            ? bliss_shared:text = "Wat betekent jouw "+familyMember+" voor jou?"
+        ? INSERT BLOCK:bliss_shared:speakTextWithEmphasis
+    ? ELSE
+        ? IF familyMember = "die"
+            ? bliss_shared:text = "Dan wil ik graag iets meer weten over jullie relatie, andere mensen noemen vaak dat iemand geduldig is, of kalmte uitstraalt, altijd klaar staat, maar wat betekent die persoon voor jou?"                
+        ? ELSEIF noKnownFamily = 0
+            ? bliss_shared:text = "Dan wil ik graag iets meer weten over jullie relatie, andere mensen noemen vaak dat iemand geduldig is, of kalmte uitstraalt, altijd klaar staat, maar wat betekent "+familyMember+" voor jou?"                
+        ? INSERT BLOCK:bliss_shared:speakTextWithEmphasis
+    ? INSERT BLOCK:bliss_shared:getASRTranscript
+    ? bliss_shared:text = "Ik zou het graag even willen omdraaien. Wat denk jij dat je betekent voor die persoon?"
+    ? INSERT BLOCK:bliss_shared:speakTextWithEmphasis
+    ? INSERT BLOCK:bliss_shared:getASRTranscript
+    ? bliss_shared:text = "Zijn er activiteiten die je graag samen doet?"
+    ? INSERT BLOCK:bliss_shared:speakTextWithEmphasis
+    ? INSERT BLOCK:bliss_shared:getASRTranscript
+
+# 4114 sequence
+? BLOCK 4114
+    ? _sd = NOW % 2
+    ? IF _sd = 0
+        ? bliss_shared:text = "Ben je lid van een vereniging of sportclub?"
+        ? INSERT BLOCK:bliss_shared:speakTextWithEmphasis        
+        ? ASK ANSWER
+            > Ja
+                ? intent = "affirm"
+            > Nee
+                ? intent = "deny"
+        ? IF intent = "affirm"
+            ? bliss_shared:text = "Kun je me iets meer vertellen over de club waar je lib van bent?"
+            ? INSERT BLOCK:bliss_shared:speakTextWithEmphasis
+            ? INSERT BLOCK:bliss_shared:getASRTranscript
+            ? bliss_shared:text = "Waarom vind je het leuk om te doen?"
+            ? INSERT BLOCK:bliss_shared:speakTextWithEmphasis
+            ? INSERT BLOCK:bliss_shared:getASRTranscript
+        ? ELSE
+            ? bliss_shared:text = "Behalve verenigingen, kun je ook heel informeel samen iets doen, zoals regelmatig afspreken om samen te fietsen of te koken. Is dat misschien wel iets voor jou?"
+            ? INSERT BLOCK:bliss_shared:speakTextWithEmphasis
+            ? INSERT BLOCK:bliss_shared:getASRTranscript
+            ? bliss_shared:text = bliss_shared:reply['hypotheses'][0]['utterance']
+            ? INSERT BLOCK:bliss_shared:getRASANLU
+            ? _intent = bliss_shared:reply['user_input']['intent']['name']
+            ? IF _intent = "deny"
+                ? bliss_shared:text = "Is dat iets waar je behoefte aan zou hebben in de toekomst?"
+                ? INSERT BLOCK:bliss_shared:speakTextWithEmphasis
+                ? INSERT BLOCK:bliss_shared:getASRTranscript
+            
+    ? ELSE
+        ? bliss_shared:text = "In zou ik het nu graag even willen hebben over hobbies die je samen met anderen doet. Ben je bijvoorbeeld lid van een vereniging zoals een kaartclub of sportvereniging?"
+        ? INSERT BLOCK:bliss_shared:speakTextWithEmphasis
+        ? ASK ANSWER
+            > Ja
+                ? intent = "affirm"
+            > Nee
+                ? intent = "deny"
+        ? IF intent = "affirm"
+            ? bliss_shared:text = "Kun je me iets meer vertellen over de club waar je lid van bent?"
+            ? INSERT BLOCK:bliss_shared:speakTextWithEmphasis
+            ? INSERT BLOCK:bliss_shared:getASRTranscript
+            ? bliss_shared:text = "Waarom vind je het leuk om te doen?"
+            ? INSERT BLOCK:bliss_shared:speakTextWithEmphasis
+            ? INSERT BLOCK:bliss_shared:getASRTranscript
+        ? ELSE
+            ? bliss_shared:text = "Behalve verenigingen, kun je ook heel informeel samen iets doen, zoals regelmatig afspreken om samen te fietsen of te koken. Is dat misschien wel iets voor jou?"
+            ? INSERT BLOCK:bliss_shared:speakTextWithEmphasis
+            ? INSERT BLOCK:bliss_shared:getASRTranscript
+            ? bliss_shared:text = bliss_shared:reply['hypotheses'][0]['utterance']
+            ? INSERT BLOCK:bliss_shared:getRASANLU
+            ? _intent = bliss_shared:reply['user_input']['intent']['name']
+            ? IF _intent = "deny"
+                ? bliss_shared:text = "Is dat iets waar je behoefte aan zou hebben in de toekomst?"
+                ? INSERT BLOCK:bliss_shared:speakTextWithEmphasis
+                ? INSERT BLOCK:bliss_shared:getASRTranscript

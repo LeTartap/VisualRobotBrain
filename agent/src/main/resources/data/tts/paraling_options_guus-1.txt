@@ -1,0 +1,21 @@
+consent2        dismissive2     happy2          interrogative4  pleasure3       sneeze
+consent3        dismissive3     happy3          interrogative5  pleasure4       sniff2
+consent4        dismissive4     happy4          interrogative   pleasure5       sniff3
+consent5        dismissive5     happy5          kiss2           pleasure        sniff4
+consent         dismissive      happy           kiss3           relieved2       sniff
+contempt2       enlightened2    hemming2        kiss            relieved3       snore2
+contempt3       enlightened3    hemming3        laugh2          relieved4       snore3
+contempt4       enlightened4    hemming         laugh3          relieved        snore
+contempt5       enlightened     hesitation2     laugh4          shush2          swallow2
+contempt        freezing2       hesitation3     laugh           shush3          swallow3
+cough2          freezing3       hesitation      mistake2        shush           swallow
+cough3          freezing4       impressed2      mistake3        sigh2           whistle2
+cough           freezing        impressed3      mistake4        sigh3           whistle3
+cry2            frightened2     impressed4      mistake5        sigh4           whistle4
+cry3            frightened3     impressed5      mistake         sigh            whistle5
+cry             frightened      impressed       pain2           sing2           whistle
+disgust2        frustrated2     inhalation2     pain3           sing3           yawn2
+disgust3        frustrated3     inhalation3     pain4           sing4           yawn3
+disgust4        frustrated4     inhalation      pain5           sing            yawn
+disgust5        frustrated5     interrogative2  pain            sneeze2
+disgust         frustrated      interrogative3  pleasure2       sneeze3

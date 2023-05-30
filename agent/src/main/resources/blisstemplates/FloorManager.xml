@@ -1,0 +1,91 @@
+<behaviourtemplates xmlns="jar://D:/GitLab/bliss-dm/agent/lib/flipper2.0-0.1.jar!/flipper.xsd">
+
+    <is name="floor">
+        {
+            "turn" : "",
+            "interrupt" : "",
+            "timePassed" : false,
+            "timeout" : 10000,
+            "timeoutFrequency": 0,
+            "time" : 0,
+            "agent" : {
+                "wait" : false,
+                "keep" : false
+            }
+        }
+    </is>
+
+    <template id="userTalking" name="user talking template" conditional="false">
+        <preconditions>
+            <condition>is.components.asr.messages.hasOwnProperty("content")</condition>
+            <condition>is.components.asr.messages.content.type === "inc"</condition>
+        </preconditions>
+        <effects>
+            <assign is="is.dialog.user.isTalking">true</assign>
+        </effects>
+    </template>
+
+    <template id="userNotTalking" name="user not talking template" conditional="false">
+        <preconditions>
+            <condition>is.components.asr.messages.hasOwnProperty("content")</condition>
+            <condition>is.components.asr.messages.content.type === "final"</condition>
+        </preconditions>
+        <effects>
+            <assign is="is.dialog.user.isTalking">false</assign>
+        </effects>
+    </template>
+
+    <template id="initTimer" name="initTimer" conditional="false">
+        <preconditions>
+            <condition>is.floor.time === 0</condition>
+        </preconditions>
+        <initeffects>
+            <assign is="is.floor.time">Date.now()</assign>
+        </initeffects>
+    </template>
+
+    <template id="userInTime" name="timein" conditional="false">
+        <preconditions>
+            <condition>!is.dialog.chatOnly</condition>
+            <condition><![CDATA[is.dialog.user.isTalking || is.dialog.agent.isTalking && is.floor.timeoutFrequency == 0]]></condition>
+<!--            <condition>prnt("Resetting timeout")</condition>-->
+        </preconditions>
+        <effects>
+            <assign is="is.floor.time">Date.now()</assign>
+            <assign is="is.floor.timePassed">false</assign>
+            <assign is="is.floor.timeoutFrequency">0</assign>
+        </effects>
+    </template>
+
+    <template id="agentExtend" name="extraTimeAgent" conditional="false">
+        <preconditions>
+            <condition>!is.dialog.chatOnly</condition>
+            <condition><![CDATA[is.dialog.agent.isTalking && is.floor.timeoutFrequency > 0]]></condition>
+        </preconditions>
+        <effects>
+            <assign is="is.floor.time">Date.now()</assign>
+            <assign is="is.floor.timePassed">false</assign>
+        </effects>
+    </template>
+
+    <template id="userOutOfTime" name="timeoutU" conditional="false">
+        <preconditions>
+            <condition>!is.dialog.chatOnly</condition>
+            <condition><![CDATA[(is.floor.time + is.floor.timeout) < Date.now()]]></condition>
+            <condition><![CDATA[!is.floor.timePassed && is.dialog.user.id != "" ]]></condition>
+            <condition><![CDATA[is.floor.timeoutFrequency < 3]]></condition>
+<!--            <condition>prnt("User timed out: " + (is.floor.timeoutFrequency+1))</condition>-->
+        </preconditions>
+        <effects>
+            <assign is="is.floor.timePassed">true</assign>
+            <assign is="is.dialog.user.isTalking">false</assign>
+            <assign is="is.dialog.agent.isTalking">false</assign>
+            <assign is="is.floor.time">Date.now()</assign>
+            <assign is="is.floor.timeoutFrequency">is.floor.timeoutFrequency+1</assign>
+            <assign is="is.floor.agent.wait">true</assign>
+            <assign is="is.dialog.agent.respond">true</assign>
+        </effects>
+    </template>
+
+
+</behaviourtemplates>

@@ -1,0 +1,275 @@
+<behaviourtemplates>
+    <is name="dialog">
+        {
+            "user" : {
+                "move" :{},
+                "respond" : false,
+                "isTalking" : false,
+                "id" : "",
+                "status" : "",
+                "information":{
+                    "name": "",
+                    "age": ""
+                },
+                "personalized": ""
+            },
+            "agent" : {
+                "move" : {},
+                "questions":{
+                    "asked" : [],
+                    "answered" : []
+                },
+                "respond" : false,
+                "isTalking" : false
+            },
+            "chatOnly": true,
+            "greeted" : false,
+            "closed" : false
+        }
+    </is>
+
+    <javascript>
+        function pushArray(array, element){
+            array.push(element);
+            return array;
+        }
+    </javascript>
+
+    
+    <!-- Check for IDs -->
+    <template id="checkID">
+        <preconditions>
+            <condition>!_.isEmpty(is.components.auth.messages)</condition>
+            <condition>"info" in is.components.auth.messages</condition>
+<!--            <condition>prnt("ID presented: "+ is.components.auth.messages.info.uid)</condition>-->
+        </preconditions>
+        <effects>
+            <assign is="is.dialog.user.id">is.components.auth.messages.info.uid</assign>
+            <assign is="is.components.um.response">UM.hasPerson({id:is.components.auth.messages.info.uid})</assign>
+            <assign is="is.components.um.temp">UM.MakeRequests("has")</assign>
+            <assign is="is.components.nvlg.response">NVLG.ErasePastIntents({type:"nvlg",content:{"erase":true}})</assign>
+            <assign is="is.components.nvlg.temp">NVLG.MakeRequests("erasePastIntents")</assign>
+            <assign is="is.components.auth.messages">{}</assign>
+            <!-- Start recording -->
+            <!-- <assign is="is.components.gui.response">GUI.updateGUI({"gui":[{type:"recording",value:true}]})</assign>
+            <assign is="is.components.gui.temp">GUI.MakeRequests("updateGUI")</assign> -->
+            <!-- Reset the timeout as well here -->
+            <assign is="is.floor.time">Date.now()</assign>
+            <assign is="is.floor.timePassed">false</assign>
+            <assign is="is.floor.timeoutFrequency">0</assign>
+            <assign is="is.dialog.agent.respond">true</assign>
+            <assign is="is.components.asr.messages">{}</assign>
+        </effects>
+    </template>
+    
+    <!-- Check for new  -->
+    <template id="checkNew">
+        <preconditions>
+            <condition>"exists" in is.components.um.messages</condition>
+            <condition>!is.components.um.messages.exists</condition>
+<!--            <condition>prnt("New person: " + is.dialog.user.id)</condition>-->
+        </preconditions>
+        <effects>
+            <assign is="is.dialog.user.status">"new"</assign>
+            <assign is="is.components.um.messages">{}</assign>
+        </effects>
+    </template>
+    
+    <!-- Check for existing -->
+    <template id="checkExisting">
+        <preconditions>
+            <condition>"exists" in is.components.um.messages</condition>
+            <condition>is.components.um.messages.exists</condition>
+<!--            <condition>prnt("Existing person: " + is.dialog.user.id)</condition>-->
+        </preconditions>
+        <effects>
+            <assign is="is.dialog.user.status">"existing"</assign>
+            <assign is="is.components.um.messages">{}</assign>
+        </effects>
+    </template>
+    
+    <!-- Initialize conversation from new ID-->
+    <template id="addNewPerson">
+        <preconditions>                 
+            <condition>is.dialog.user.status === "new"</condition>
+<!--            <condition>prnt("Adding new person")</condition>-->
+        </preconditions>
+        <effects>                        
+            <assign is="is.components.um.response">UM.addPerson({id:is.dialog.user.id})</assign>
+            <assign is="is.components.um.temp">UM.MakeRequests("add")</assign>
+            <assign is="is.components.gui.response">GUI.updateGUI({"gui":[{type:"id",value:is.dialog.user.id},{type:"recording",value:true}]})</assign>
+            <assign is="is.components.gui.temp">GUI.MakeRequests("updateGUI")</assign>
+            <assign is="is.components.nvlu.messages">{intent:"greeting",first:true}</assign>
+            <assign is="is.dialog.user.status">""</assign>
+            <assign is="is.floor.agent.wait">true</assign>
+            <assign is="is.dialog.user.personalized">Math.floor(Math.random() * 2)</assign>
+        </effects>
+    </template>
+    
+     <!-- Initialize conversation from existing ID-->
+    <template id="getExistingPerson">
+        <preconditions>            
+            <condition>is.dialog.user.status === "existing"</condition>
+<!--            <condition>prnt("Getting Existing person")</condition>-->
+        </preconditions>
+        <effects>            
+            <assign is="is.components.um.response">UM.getPerson({id:is.dialog.user.id})</assign>
+            <assign is="is.components.um.temp">UM.MakeRequests("get")</assign>
+            <assign is="is.components.gui.response">GUI.updateGUI({"gui":[{type:"id",value:is.dialog.user.id},{type:"recording",value:true}]})</assign>
+            <assign is="is.components.gui.temp">GUI.MakeRequests("updateGUI")</assign>
+            <assign is="is.components.nvlu.messages">{intent:"greeting",first:false}</assign>
+            <assign is="is.dialog.user.status">""</assign>
+            <assign is="is.floor.agent.wait">true</assign>
+        </effects>
+    </template>
+
+
+    <!-- End the conversation
+    Clean up all the remaing parts of the dialog
+    - Send last update to the database
+    - End recording
+    - Clean out the User ID
+    - Reset the floor timer
+    -->
+    <template id="closeConversation">
+        <preconditions>
+            <condition><![CDATA[!(_.isEmpty(is.components.nvlg.messages)) && is.components.nvlg.messages.hasOwnProperty("intent")]]></condition>
+            <condition>is.components.nvlg.messages.intent === "valediction"</condition>
+<!--            <condition>prnt("Ending the conversation")</condition>-->
+        </preconditions>
+        <effects>
+            <assign is="is.components.um.response">UM.updatePerson({id:is.dialog.user.id,type:"numberofsessions",value:1})</assign>
+            <assign is="is.components.um.temp">UM.MakeRequests("update")</assign>
+            <assign is="is.components.um.response">UM.updateUser({id:is.dialog.user.id,type:"state",value:is.dialog.user.information})</assign>
+            <assign is="is.components.um.temp">UM.MakeRequests("updateUser")</assign>
+            <!-- Stop recording -->
+            <assign is="is.components.gui.response">GUI.updateGUI({"gui":[{type:"recording",value:false}]})</assign>
+            <assign is="is.components.gui.temp">GUI.MakeRequests("updateGUI")</assign>
+            <assign is="is.dialog.user.id">""</assign>
+            <assign is="is.floor.timeoutFrequency">0</assign>
+        </effects>
+    </template>
+
+    <!-- Determine the topics based on the semantic parsing -->
+    <template id="addTopics">
+        <preconditions>
+            <condition><![CDATA[!(_.isEmpty(is.components.nvlu.messages)) && "topics" in is.components.nvlu.messages]]></condition>
+<!--            <condition><![CDATA[!isEmpty(is.components.nvlu.messages.content)]]></condition>-->
+<!--            <condition><![CDATA[prnt("Adding topics: " + JSON.stringify(is.components.nvlu.messages))]]></condition>-->
+        </preconditions>
+        <effects>
+            <assign is="is.components.um.response">UM.MakeUMTopicRequest(is.components.nvlu.messages)</assign>
+            <assign is="is.components.um.temp">UM.MakeRequests("addTopics")</assign>
+        </effects>
+    </template>
+
+    <!-- Template that determines the intent of the agent  based on condition
+        - There is a new user intent
+    -->
+    <template id="performNVLGUser">
+        <preconditions>
+            <condition><![CDATA[!(_.isEmpty(is.components.nvlu.messages)) && "intent" in is.components.nvlu.messages || is.floor.agent.keep && !is.dialog.agent.isTalking]]></condition>
+<!--            <condition>prnt(JSON.stringify(is.components.nvlu.messages))</condition>-->
+            <condition>is.dialog.agent.respond</condition>
+<!--            <condition>prnt("Retrieving agent intent and content")</condition>-->
+        </preconditions>
+        <effects>
+            <assign is="is.components.nvlg.response">NVLG.MakeNVLGRequest({type:"intent",content:is.components.nvlu.messages,interaction:is.floor})</assign>
+            <assign is="is.components.nvlg.temp">NVLG.MakeRequests("send_ic")</assign>
+            <assign is="is.components.um.response">UM.updatePerson({id:is.dialog.user.id,type:"state",value:{"nvlu":is.components.nvlu.messages}})</assign>
+            <assign is="is.components.um.temp">UM.MakeRequests("update")</assign>
+            <assign is="is.components.nvlu.messages">{}</assign>
+            <assign is="is.floor.agent.keep">false</assign>
+            <assign is="is.dialog.agent.respond">false</assign>
+            <assign is="is.floor.time">Date.now()</assign>
+        </effects>
+    </template>
+
+    <!-- Once we know the intent and content for the agent, we send it if no one is talking-->
+    <template id="performTTS">
+        <preconditions>
+            <condition>!is.dialog.agent.isTalking</condition>
+            <condition>!is.dialog.user.isTalking</condition>
+            <condition><![CDATA[!(_.isEmpty(is.components.nvlg.messages))]]></condition>
+            <condition>"intent" in is.components.nvlg.messages</condition>
+<!--            <condition>prnt("Sending agent speech")</condition>-->
+        </preconditions>
+        <effects>
+            <assign is="is.components.tts.response">TTS.MakeSpeakRequest({type:"text",parameters:is.components.nvlg.messages})</assign>
+            <assign is="is.components.tts.temp">TTS.MakeRequests("send_tts")</assign>
+            <assign is="is.components.um.response">UM.updatePerson({id:is.dialog.user.id,type:"state",value:{"nvlg":is.components.nvlg.messages}})</assign>
+            <assign is="is.components.um.temp">UM.MakeRequests("update")</assign>
+            <assign is="is.components.nvlg.messages">{}</assign>
+            <assign is="is.floor.time">Date.now()</assign>
+
+        </effects>
+    </template>
+
+    <template id="storeTTS">
+        <preconditions>
+            <condition><![CDATA[!(_.isEmpty(is.components.tts.messages))]]></condition>
+            <condition><![CDATA[is.components.tts.messages.hasOwnProperty("text")]]></condition>
+<!--                        <condition>prnt("Storing TTS")</condition>-->
+        </preconditions>
+        <effects>
+            <assign is="is.components.um.response">UM.updatePerson({id:is.dialog.user.id,type:"state",value:{"tts":is.components.tts.messages}})</assign>
+            <assign is="is.components.um.temp">UM.MakeRequests("update")</assign>
+            <assign is="is.components.tts.messages">{}</assign>
+            <assign is="is.dialog.agent.respond">true</assign>
+            <assign is="is.floor.time">Date.now()</assign>
+        </effects>
+    </template>
+
+    <!-- Template that makes sure that we don't respond to late ASR outputs -->
+    <template id="checkASRValidity">
+        <preconditions>
+            <condition>!_.isEmpty(is.components.asr.messages)</condition>
+            <condition>is.components.asr.messages.type === "final"</condition>
+            <condition>is.dialog.user.id != ""</condition>
+            <condition><![CDATA[is.dialog.agent.isTalking]]></condition>
+        </preconditions>
+        <effects>
+            <assign is="is.components.asr.messages">{}</assign>            
+            <assign is="is.floor.time">Date.now()</assign>
+        </effects>
+    </template>
+
+    <!-- Template that determines the response and intent of the user -->
+    <template id="performNVLU">
+        <preconditions>
+            <condition>!_.isEmpty(is.components.asr.messages)</condition>
+            <condition>is.components.asr.messages.type === "final"</condition>
+            <condition>is.dialog.user.id != ""</condition>
+            <condition><![CDATA[!is.dialog.user.isTalking && !is.dialog.agent.isTalking]]></condition>
+<!--            <condition>prnt("Retrieving user intent and content")</condition>-->
+        </preconditions>
+        <effects>
+            <assign is="is.components.nvlu.response">NVLU.MakeNVLURequest(is.components.asr.messages)</assign>
+            <assign is="is.components.nvlu.temp">NVLU.MakeRequests("nvlu")</assign>
+            <assign is="is.components.um.response">UM.updatePerson({id:is.dialog.user.id,type:"state",value:{"asr":is.components.asr.messages}})</assign>
+            <assign is="is.components.um.temp">UM.MakeRequests("update")</assign>
+            <assign is="is.components.asr.messages">{}</assign>
+            <assign is="is.dialog.agent.respond">true</assign>
+            <assign is="is.floor.time">Date.now()</assign>
+        </effects>
+    </template>
+
+    <!-- Template that determines the response and intent of the agent without user input-->
+    <template id="performInteractionNVLU">
+        <preconditions>
+            <condition><![CDATA[is.floor.timePassed && is.floor.agent.wait]]></condition>
+            <condition><![CDATA[!is.dialog.user.isTalking && !is.dialog.agent.isTalking]]></condition>
+<!--            <condition>prnt("Retrieving user interaction intent and content")</condition>-->
+        </preconditions>
+        <effects>
+            <assign is="is.components.nvlu.response">NVLU.MakeNVLURequest({interaction:is.floor})</assign>
+            <assign is="is.components.nvlu.temp">NVLU.MakeRequests("nvlu")</assign>
+            <assign is="is.components.um.response">UM.updatePerson({id:is.dialog.user.id,type:"state",value:{"interaction":is.floor}})</assign>
+            <assign is="is.components.um.temp">UM.MakeRequests("update")</assign>
+            <assign is="is.floor.agent.wait">false</assign>
+            <assign is="is.floor.timePassed">false</assign>
+            <assign is="is.floor.time">Date.now()</assign>
+        </effects>
+    </template>
+
+</behaviourtemplates>

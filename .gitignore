@@ -1,0 +1,15 @@
+agent/.gradle/
+agent/build/
+agent/.idea/
+.idea/vcs.xml
+.idea/
+.gradle/
+agent/log/
+database/
+agent/src/main/resources/external/ASR.json
+agent/src/main/resources/external/TTS.json
+log/
+rasa/
+external/senna/
+whappbot/bliss_shared_block.scl
+whappbot/testASR.scl

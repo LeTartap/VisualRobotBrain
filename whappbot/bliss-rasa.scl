@@ -1,0 +1,61 @@
+# Author: Jelte van Waterschoot
+# Group: Human Media Interaction, University of Twente
+# Contact: j.b.vanwaterschoot@utwente.nl
+? SET {'title':'Babbelbot'}
+
+# Change to 1 if you want to reset.
+? reset = 0
+# ? reset = 1
+
+? IF bliss_data_sd:profile = NULL OR reset = 1
+    ? INSERT BLOCK:bliss_data_sd:resetData
+    ? bliss_data_sd:profile["type"] = "rasa"
+    ? INSERT BLOCK:bliss_shared:resetData
+    ? INSERT BLOCK:bliss_secrets:resetData
+
+? bliss_shared:text = 'Dit is een demo van het BLISS project. Typ "stop" om het gesprek af te sluiten.'
+<<bliss_shared:text>>
+
+? bliss_shared:text = 'Hoe gaat het?'
+# ? INSERT BLOCK:bliss_shared:speakTextWithEmphasis
+<<bliss_shared:text>>
+
+? _mood = ASK TEXT
+? bliss_shared:text = _mood
+? INSERT BLOCK:bliss_shared:getSentiment
+? _polarity = bliss_shared:reply['sentiment']['polarity']
+
+? IF _polarity >= 0.5
+    ? bliss_shared:text = "Goed om te horen!"
+? ELSE
+    ? bliss_shared:text = "Hopelijk beter de volgende keer.."
+# ? INSERT BLOCK:bliss_shared:speakTextWithEmphasis
+<<bliss_shared:text>>
+
+? bliss_shared:text = _mood
+
+? INSERT BLOCK:bliss_shared:getRASANLU
+<<TYPEOF bliss_shared:reply>>
+? _intent = bliss_shared:reply['user_input']['intent']['name']
+? INSERT BLOCK:bliss_shared:getRASAResponse
+? _behaviour = bliss_shared:reply['text']
+
+? bliss_shared:text = _behaviour
+<<bliss_shared:text>>
+# ? INSERT BLOCK:bliss_shared:speakTextWithEmphasis
+
+? _response = ASK TEXT
+? bliss_shared:text = _response
+
+? WHILE _response != "stop"
+    ? INSERT BLOCK:bliss_shared:getRASANLU
+    <<STRINGIFY bliss_shared:reply['user_input']>>
+    ? INSERT BLOCK:bliss_shared:getRASAResponse
+    ? _behaviour = bliss_shared:reply['text']
+    ? bliss_shared:text = _behaviour
+    <<bliss_shared:text>>
+    # ? INSERT BLOCK:bliss_shared:speakTextWithEmphasis
+
+    ? _response = ASK TEXT
+    ? bliss_shared:text = _response
+

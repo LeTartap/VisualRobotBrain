@@ -1,0 +1,7 @@
+Mac:
+Create virtual environment (Python 3.6 preferably)
+Install homebrew
+Install mysql
+brew install mysql
+Inside a virtual environment: LDFLAGS=-L/usr/local/opt/openssl/lib pip install mysqlclient
+pip install -r requirements.txt

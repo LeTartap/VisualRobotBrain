@@ -1,0 +1,1017 @@
+[
+  {
+    "id": 100,
+    "intent": "repeat",
+    "content": "REPEAT",
+    "turn": "assign",
+    "unique": false,
+    "conditions": [
+      {
+        "move":{
+          "user":{
+            "intent":"repeat"
+          }
+        }
+      },
+      {
+        "move":{
+          "user": {
+            "intent": "pausing",
+            "timeoutFrequency": 1
+          }
+        }
+      },
+      {
+        "move": {
+          "user": {
+            "intent": ["contact"],
+            "timeoutFrequency": 0
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": 101,
+    "intent": "contact",
+    "content": [
+      "Bent u daar?","Hallo?","Bent u er nog?"
+    ],
+    "turn": "assign",
+    "unique": false,
+    "conditions": [
+      {
+        "move": {
+          "user": {
+            "intent": "pausing",
+            "timeoutFrequency": 2
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": 1,
+    "intent": "greeting",
+    "content": "Hallo! Ik zou graag eens met u willen praten over wat u leuk vindt om te doen, zowel voor, tijdens als na de coronacrisis.",
+    "turn": "keep",
+    "unique":true
+  },
+  {
+    "id": 2,
+    "intent": "question",
+    "content": ["Kunt u iets vertellen over wat u altijd leuk vond om te doen, maar dat u nu niet meer kunt doen door de coronacrisis?","Wat vond u altijd leuk om te doen, en mist u nu het meeste in deze coronacrisis?"],
+    "turn": "assign",
+    "unique":true,
+    "conditions": [
+      {
+        "move": {
+          "agent": {
+            "id": 1
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": 3,
+    "intent": "question",
+    "content": "Zijn er andere hobby's die u niet meer kunt doen vanwege de coronacrisis?",
+    "turn": "assign",
+    "unique":true,
+    "conditions": [
+      {
+        "move": {
+          "agent": {
+            "id": 2
+          },
+          "user": {
+            "intent": ["inform","confirm"]
+          }
+        },
+        "notmove": {
+          "agent": {
+            "id":4
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": 9,
+    "intent": "question",
+    "content": ["Wat maakte dat u deze activiteit zo leuk vond?","Waarom vindt u dit leuk?"],
+    "turn": "assign",
+    "unique":true,
+    "conditions": [
+      {
+        "move": {
+          "agent": {
+            "id": 3
+          },
+          "user": {
+            "intent": ["confirm","inform"]
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id" : 4,
+    "intent": "question",
+    "content": "Heeft u nieuwe hobby's opgepakt tijdens de coronacrisis?",
+    "turn": "assign",
+    "unique":true,
+    "conditions" :[
+      {
+      "move" : {
+        "agent": {
+          "id": 9
+        },
+        "user": {
+          "intent": "inform"
+        }
+      }
+    },
+      {
+        "move": {
+          "agent": {
+            "id": 2
+          },
+          "user":{
+            "intent": "disconfirm"
+          }
+        }
+      },
+      {
+        "move": {
+          "agent": {
+            "id": 3
+          },
+          "user":{
+            "intent": "disconfirm"
+          }
+        }
+      }
+    ]
+  },
+
+ {
+    "id": 5,
+    "intent": "question",
+    "content": "Wat doet u tegenwoordig, in deze coronacrisis, graag ter ontspanning?",
+    "turn": "assign",
+    "unique":true,
+    "conditions": [
+      {
+        "move": {
+          "agent": {
+            "id": 4
+          },
+          "user": {
+            "intent": ["disconfirm"]
+          }
+        },
+        "notmove": {
+          "agent":{
+            "id": 11
+          }
+        }
+      },
+      {
+        "move": {
+          "agent": {
+            "id": 9
+          },
+          "user": {
+            "intent": ["disconfirm","confirm","inform"]
+          }
+        }
+      }
+    ]
+ },
+  
+  {
+    "id": 11,
+    "intent": "question",
+    "content": "Als u nu terugkijkt op deze dingen, zou u het leuk vinden om dit na de crisistijd weer te doen?",
+    "turn": "assign",
+    "unique":true,
+    "conditions": [
+      {
+      "move": {
+        "agent": {
+          "id": 4
+        },
+        "user": {
+          "intent": ["confirm","inform"]
+        }
+      }
+      },
+      {
+        "move": {
+          "agent": {
+            "id": 5
+          },
+          "user": {
+            "intent": ["confirm","inform","disconfirm"]
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": 12,
+    "intent": "question",
+    "content": "Waarom?",
+    "turn": "assign",
+    "unique":true,
+    "conditions": [
+      {
+        "move": {
+          "agent": {
+            "id": 11
+          },
+          "user": {
+            "intent": ["inform","confirm"]
+          }
+        },
+        "notmove":
+        {
+          "agent": {
+            "id":[13,15]
+          }
+        }
+      }]
+  },
+  {
+    "id": 13,
+    "intent": "question",
+    "content": "Waarom niet?",
+    "turn": "assign",
+    "unique":true,
+    "conditions": [
+      {
+        "move": {
+          "agent": {
+            "id": 11
+          },
+          "user": {
+            "intent": "disconfirm"
+          }
+        },
+        "notmove": {
+          "agent": {
+            "id": [14,15]
+          }
+        }
+      }]
+  },
+  {
+    "id": 14,
+    "intent": "inform",
+    "content": "Laten we over een volgend onderwerp praten, namelijk uw rol in het leven van anderen",
+    "turn": "keep",
+    "unique":true,
+    "conditions": [{
+      "move": {
+        "agent": {
+          "id": 12
+        },
+        "user": {
+          "intent": "inform"
+        }
+      }
+    },
+    {
+      "move": {
+        "agent": {
+          "id": 13
+        },
+        "user": {
+          "intent": "inform"
+        }
+      }
+    }]
+  },
+  {
+    "id": 15,
+    "intent": "question",
+    "content": "Voor welke klusjes of wijze raad kwamen mensen altijd naar u toe?",
+    "turn": "assign",
+    "unique":true,
+    "conditions": [{
+      "move": {
+        "agent": {
+          "id": 14
+        }
+      }
+    }
+      ]
+  },
+  {
+    "id": 16,
+    "intent" : "question",
+    "content": "Waarom denkt u dat dit was?",
+    "turn": "assign",
+    "unique":true,
+    "conditions": [{
+      "move": {
+        "agent": {
+          "id": 15
+        },
+        "user": {
+          "intent": "inform"
+        }
+      }
+    }
+      ]
+  },
+  {
+    "id": 17,
+    "intent": "question",
+    "content": "Wat zou u anderen kunnen bijleren?",
+    "turn": "assign",
+    "unique":true,
+    "conditions": [{
+      "move": {
+        "agent": {
+          "id": 16
+        },
+        "user": {
+          "intent": "inform"
+        }
+      }
+    }
+      ]
+  },
+  {
+    "id": 18,
+    "intent": "inform",
+    "content": "Dan zou ik het nu graag even willen hebben over hobbies die u samen met anderen doet, dus die u normaal gezien voor de coronacrisis altijd deed.",
+    "turn": "keep",
+    "unique":true,
+    "conditions": [{
+      "move": {
+        "agent": {
+          "id": 17
+        },
+        "user": {
+          "intent": "inform"
+        }
+      }
+    }
+    ]
+  },
+  {
+    "id": 19,
+    "intent": "question",
+    "content": "Bent u bijvoorbeeld lid van een vereniging zoals een kaartclub of sportvereniging?",
+    "turn": "assign",
+    "unique":true,
+    "conditions": [{
+      "move": {
+        "agent": {
+          "id": 18
+        }
+      }
+    }
+    ]
+  },
+  {
+    "id": 20,
+    "intent": "question",
+    "content": "Van welke vereniging of club bent u lid?",
+    "turn": "assign",
+    "unique":true,
+    "conditions": [{
+      "move": {
+        "agent": {
+          "id": 19
+        },
+        "user": {
+          "intent": ["confirm","inform"]
+        }
+      },
+      "notmove": {
+        "agent": {
+          "id":23
+        }
+      }
+    }
+    ]
+  },
+  
+  {
+    "id": 22,
+    "intent": "question",
+    "content": "Waarom vindt u het leuk om te doen?",
+    "turn": "assign",
+    "unique":true,
+    "conditions": [{
+      "move": {
+        "agent": {
+          "id": 20
+        },
+        "user": {
+          "intent": ["confirm","inform"]
+        }
+      }
+    }
+    ]
+  },
+  {
+    "id": 23,
+    "intent": "question",
+    "content": ["Deed u voor de corona crisis wel eens mee aan de activiteiten hier in de buurt?","Was er voor de corona crisis een leuke activiteit die u wekelijks deed?"],
+    "turn": "assign",
+    "unique":true,
+    "conditions": [{
+      "move": {
+        "agent": {
+          "id": 22
+        },
+        "user": {
+          "intent": "inform"
+        }
+      }
+    },
+      {
+        "move": {
+          "agent": {
+            "id": 19
+          },
+          "user": {
+            "intent": "disconfirm"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": 24,
+    "intent": "question",
+    "content": "Vertel er eens iets meer over.",
+    "turn": "assign",
+    "unique":true,
+    "conditions": [{
+      "move": {
+        "agent": {
+          "id": 23
+        },
+        "user": {
+          "intent": ["confirm","inform"]
+        }
+      }
+    }
+    ]
+  },
+  {
+    "id": 25,
+    "intent": "question",
+    "content": "Zijn er activiteiten die u graag zou willen doen maar waar u nu nog niet aan meedoet?",
+    "turn": "assign",
+    "unique":true,
+    "conditions": [{
+      "move": {
+        "agent": {
+          "id": 24
+        },
+        "user": {
+          "intent": "inform"
+        }
+      }
+    },
+      {
+        "move": {
+          "agent": {
+            "id": 23
+          },
+          "user": {
+            "intent": "disconfirm"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": 26,
+    "intent": "question",
+    "content": ["Waar liggen uw talenten?","Waar bent u nu goed in?"],
+    "turn": "assign",
+    "unique":true,
+    "conditions": [
+      {
+      "move": {
+        "agent": {
+          "id": 25
+        },
+        "user": {
+          "intent": ["inform","confirm","disconfirm"]
+        }
+      }
+    }
+    ]
+  },
+  {
+    "id": 27,
+    "intent": "question",
+    "content": ["Zouden anderen daar nog iets van kunnen leren?","Zou dit iets zijn waar andere mensen ook iets van u kunnen leren?"],
+    "turn": "assign",
+    "unique":true,
+    "conditions": [{
+      "move": {
+        "agent": {
+          "id": 26
+        },
+        "user": {
+          "intent": "inform"
+        }
+      }
+    }
+    ]
+  },
+  {
+    "id": 28,
+    "intent": "valediction",
+    "content": "Dank u wel voor het antwoorden. Leuk dat u heeft meegedaan!",
+    "turn": "assign",
+    "conditions": [
+      {
+        "move": {
+          "agent": {
+            "id": 55
+          }
+        },
+        "user": {
+          "intent": "inform"
+        }
+      },
+      {
+        "move":{
+          "user": {
+            "intent":"valediction"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": 30,
+    "intent": "inform",
+    "content": "Dan zou ik graag eens met u willen praten over de mensen die belangrijk zijn in uw leven. Over de mensen die dichtbij u staan, die voor u belangrijk zijn of die altijd voor u klaarstaan.",
+    "turn": "keep",
+    "unique":true,
+    "conditions": [
+      {
+        "move": {
+          "agent": {
+            "id": 27
+          }
+        },
+        "user": {          
+        }
+      }
+    ]
+  },
+  {
+    "id": 31,
+    "intent": "question",
+    "content": "Als u eens aan uw familie denkt, wie is dan de eerste die in uw gedachten opkomt?",
+    "turn": "assign",
+    "unique":true,
+    "conditions": [{
+      "move": {
+        "agent": {
+          "id": 30
+        }
+      }
+    }
+    ]
+  },
+  {
+    "id": 32,
+    "intent": "question",
+    "content": ["Hoe zou u de band met deze persoon omschrijven?","Wat betekent deze persoon voor u?"],
+    "turn": "assign",
+    "unique":true,
+    "conditions": [{
+      "move": {
+        "agent": {
+          "id": 31
+        },
+        "user": {
+          "intent": "inform"
+        }
+      }
+    }
+    ]
+  },
+  {
+    "id": 33,
+    "intent": "question",
+    "content": "Ik zou het graag even willen omdraaien. Wat denkt u dat u betekent voor deze persoon?",
+    "turn": "assign",
+    "unique":true,
+    "conditions": [{
+      "move": {
+        "agent": {
+          "id": 32
+        },
+        "user": {
+          "intent": "inform"
+        }
+      }
+    }
+    ]
+  },
+  {
+    "id": 34,
+    "intent": "question",
+    "content": "Zijn er activiteiten die u graag samen doet met deze persoon?",
+    "turn": "assign",
+    "unique":true,
+    "conditions": [{
+      "move": {
+        "agent": {
+          "id": 33
+        },
+        "user": {
+          "intent": "inform"
+        }
+      }
+    }
+    ]
+  },
+  {
+    "id": 35,
+    "intent": "question",
+    "content": "Hoe houden jullie contact nu in de coronacrisis?",
+    "turn": "assign",
+    "unique":true,
+    "conditions": [{
+      "move": {
+        "agent": {
+          "id": 34
+        },
+        "user": {
+          "intent": ["inform","confirm","disconfirm"]
+        }
+      }
+    }
+    ]
+  },
+  {
+    "id": 36,
+    "intent": "question",
+    "content": ["Hoe vaak hadden jullie vòor de coronacrisis contact met elkaar?","Spreken jullie elkaar regelmatig?"],
+    "turn": "assign",
+    "unique":true,
+    "conditions": [{
+      "move": {
+        "agent": {
+          "id": 35
+        },
+        "user": {
+          "intent": "inform"
+        }
+      }
+    }
+    ]
+  },
+  {
+    "id": 37,
+    "intent": "question",
+    "content": "Op welke manier hielden jullie toen contact, belden jullie elkaar of zagen jullie elkaar?",
+    "turn": "assign",
+    "unique":true,
+    "conditions": [{
+      "move": {
+        "agent": {
+          "id": 36
+        },
+        "user": {
+          "intent": ["inform","confirm","diconfirm"]
+        }
+      }
+    }
+    ]
+  },
+  {
+    "id": 38,
+    "intent": "question",
+    "content": "Zou u nu vaker contact willen hebben?",
+    "turn": "assign",
+    "unique":true,
+    "conditions": [{
+      "move": {
+        "agent": {
+          "id": 37
+        },
+        "user": {
+          "intent": "inform"
+        }
+      }
+    }
+    ]
+  },
+  {
+    "id": 39,
+    "intent": "question",
+    "content": "Denkt u dat u ook in de toekomst, na de crisis, gemakkelijk contact met deze persoon kunt blijven hebben?",
+    "turn": "assign",
+    "unique":true,
+    "conditions": [{
+      "move": {
+        "agent": {
+          "id": 38
+        },
+        "user": {
+          "intent": ["confirm","disconfirm","inform"]
+        }
+      }
+    }
+    ]
+  },
+  {
+    "id": 40,
+    "intent": "question",
+    "content": "Dan zou ik nu graag willen praten over vrienden of kennissen.",
+    "turn": "keep",
+    "unique":true,
+    "conditions": [{
+      "move": {
+        "agent": {
+          "id": 39
+        },
+        "user": {
+          "intent": ["confirm","disconfirm","inform"]
+        }
+      }
+    }
+    ]
+  },
+  {
+    "id": 41,
+    "intent": "question",
+    "content": "Als u daaraan denkt, wie is dan de eerste die in uw gedachten opkomt?",
+    "turn": "assign",
+    "unique":true,
+    "conditions": [{
+      "move": {
+        "agent": {
+          "id": 40
+        }
+      }
+    }
+    ]
+  },
+  {
+    "id": 42,
+    "intent": "question",
+    "content": ["Hoe zou u de band met deze persoon omschrijven?","Hebben jullie een goede band?"],
+    "turn": "assign",
+    "unique":true,
+    "conditions": [{
+      "move": {
+        "agent": {
+          "id": 41
+        },
+        "user": {
+          "intent": ["inform"]
+        }
+      }
+    }
+    ]
+  },{
+  "id": 43,
+  "intent": "question",
+  "content": ["Ik zou het graag even willen omdraaien. Wat denkt u dat u betekent voor deze persoon?"],
+  "turn": "assign",
+  "unique":true,
+  "conditions": [{
+    "move": {
+      "agent": {
+        "id": 42
+      },
+      "user": {
+        "intent": ["inform","confirm","disconfirm"]
+      }
+    }
+  }
+  ]
+},
+  {
+    "id": 44,
+    "intent": "question",
+    "content": "Zijn er activiteiten die u graag samen doet met deze persoon?",
+    "turn": "assign",
+    "unique":true,
+    "conditions": [{
+      "move": {
+        "agent": {
+          "id": 43
+        },
+        "user": {
+          "intent": ["inform"]
+        }
+      }
+    }
+    ]
+  },
+  {
+    "id": 45,
+    "intent": "question",
+    "content": "Hoe houden jullie contact nu in de coronacrisis?",
+    "turn": "assign",
+    "unique":true,
+    "conditions": [{
+      "move": {
+        "agent": {
+          "id": 44
+        },
+        "user": {
+          "intent": ["inform","confirm","disconfirm"]
+        }
+      }
+    }
+    ]
+  },
+  {
+    "id": 46,
+    "intent": "question",
+    "content": "Hoe vaak hebben jullie eigenlijk nu contact? Spreken jullie elkaar regelmatig?",
+    "turn": "assign",
+    "unique":true,
+    "conditions": [{
+      "move": {
+        "agent": {
+          "id": 45
+        },
+        "user": {
+          "intent": "inform"
+        }
+      }
+    }
+    ]
+  },
+  {
+    "id": 47,
+    "intent": "question",
+    "content": "Op welke manier hadden jullie contact voor de coronacrisis?",
+    "turn": "assign",
+    "unique":true,
+    "conditions": [{
+      "move": {
+        "agent": {
+          "id": 46
+        },
+        "user": {
+          "intent": ["confirm","disconfirm","inform"]
+        }
+      }
+    }
+    ]
+  },
+  {
+    "id": 48,
+    "intent": "question",
+    "content": "Zou u nu vaker contact willen hebben?",
+    "turn": "assign",
+    "unique":true,
+    "conditions": [{
+      "move": {
+        "agent": {
+          "id": 47
+        },
+        "user": {
+          "intent": "inform"
+        }
+      }
+    }
+    ]
+  },
+  {
+    "id": 49,
+    "intent": "question",
+    "content": "Denkt u dat u ook in de toekomst, na de crisis, gemakkelijk contact met deze persoon kunt blijven hebben?",
+    "turn": "assign",
+    "unique":true,
+    "conditions": [{
+      "move": {
+        "agent": {
+          "id": 48
+        },
+        "user": {
+          "intent": ["confirm","disconfirm","inform"]
+        }
+      }
+    }
+    ]
+  },
+  {
+    "id": 50,
+    "intent": "question",
+    "content": "Tot slot over uw eigen rol en over de mensen om u heen.",
+    "turn": "keep",
+    "unique":true,
+    "conditions": [{
+      "move": {
+        "agent": {
+          "id": 49
+        },
+        "user": {
+          "intent": ["confirm","disconfirm","inform"]
+        }
+      }
+    }
+    ]
+  },
+  {
+    "id": 51,
+    "intent": "question",
+    "content": "Bij wie helpt u wel eens een handje?",
+    "turn": "assign",
+    "unique":true,
+    "conditions": [{
+      "move": {
+        "agent": {
+          "id": 50
+        }
+      }
+    }
+    ]
+  },
+  {
+    "id": 52,
+    "intent": "question",
+    "content": "Met wie maakt u wel eens een praatje omdat die wel eens eenzaam is?",
+    "turn": "assign",
+    "unique":true,
+    "conditions": [{
+      "move": {
+        "agent": {
+          "id": 51
+        },
+        "user": {
+          "intent": "inform"
+        }
+      }
+    }
+    ]
+  },
+  {
+    "id": 53,
+    "intent": "question",
+    "content": "Maakt u wel eens iemand aan het lachen? En wie dan?",
+    "turn": "assign",
+    "unique":true,
+    "conditions": [{
+      "move": {
+        "agent": {
+          "id": 52
+        },
+        "user": {
+          "intent": "inform"
+        }
+      }
+    }
+    ]
+  },
+  {
+    "id": 54,
+    "intent": "question",
+    "content": "Wie voelen zich op hun gemak bij u?",
+    "turn": "assign",
+    "unique":true,
+    "conditions": [{
+      "move": {
+        "agent": {
+          "id": 53
+        },
+        "user": {
+          "intent": "inform"
+        }
+      }
+    }
+    ]
+  },
+  {
+    "id": 55,
+    "intent": "question",
+    "content": "Hoe vond u dat het gesprek ging?",
+    "turn": "assign",
+    "unique":true,
+    "conditions": [{
+      "move": {
+        "agent": {
+          "id": 54
+        },
+        "user": {
+          "intent": "inform"
+        }
+      }
+    }
+    ]
+  }
+]

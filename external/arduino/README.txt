@@ -1,0 +1,1 @@
+This code is tested on an Arduino Uno using an RFID-RC522 connected through USB.

@@ -1,0 +1,22 @@
+{
+  "middleware": {
+    "loaderClass": "nl.utwente.hmi.middleware.activemq.ActiveMQMiddlewareLoader",
+    "properties": {
+      "iTopic": "BLISS/out",
+      "oTopic": "BLISS/in",
+      "amqBrokerURI": "tcp://localhost:61616"
+    }
+  },
+  "realizer": {
+    "type": "ReadSpeaker",
+    "properties": {
+      "language": "nl_nl",
+      "voice": "Guus",
+      "streaming": 0,
+      "audioformat": "pcm"
+    },
+
+    "_api": "REMOVE BEFORE PUSHING TO GIT not in use: AIzaSyA6b0UbFNLcap6-jUswnYFKSUSH5SFFM-E",
+    "url": "https://tts.readspeaker.com/a/speak"
+  }
+}

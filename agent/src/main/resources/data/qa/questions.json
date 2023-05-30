@@ -1,0 +1,163 @@
+[
+  {
+    "id": "lw1",
+    "lvl1" : "lifestyle",
+    "lvl2" : "work",
+    "hv" : "paid job",
+    "question" : "Heeft u op dit moment een betaalde baan?",
+    "answertype" : "YN",
+    "conditions" : []
+  },
+  {
+    "id": "lw2",
+    "lvl1" : "lifestyle",
+    "lvl2" : "work",
+    "hv" : "job tasks",
+    "question" : "Wat voor werkzaamheden doet u zoal in uw huidige baan?",
+    "answertype" : "WH",
+    "conditions" : [
+      {
+        "id" : "lw1",
+        "answer" : "ja"
+      }
+    ]
+  },
+  {
+    "id": "lw3",
+    "lvl1" : "lifestyle",
+    "lvl2" : "work",
+    "hv" : "pensioned",
+    "question" : "Bent u reeds met pensioen?",
+    "answertype" : "YN",
+    "conditions" : [
+      {
+        "id" : "lw1",
+        "answer" : "nee"
+      }
+    ]
+  },
+  {
+    "id": "ll1",
+    "lvl1" : "lifestyle",
+    "lvl2" : "leisure",
+    "hv" : "hobbies",
+    "question" : "Gaat u graag uit eten?",
+    "answertype" : "YN",
+    "conditions" : []
+  },
+  {
+    "id": "ll2",
+    "lvl1" : "lifestyle",
+    "lvl2" : "leisure",
+    "hv" : "hobbies",
+    "question" : "Kookt u graag?",
+    "answertype" : "YN",
+    "conditions" : []
+  },
+  {
+    "id": "ll3",
+    "lvl1" : "lifestyle",
+    "lvl2" : "leisure",
+    "hv" : "holidays",
+    "question" : "Gaat u graag op vakantie?",
+    "answertype" : "YN",
+    "conditions" : []
+  }
+,
+  {
+    "id": "ll4",
+    "lvl1" : "lifestyle",
+    "lvl2" : "leisure",
+    "hv" : "holidays",
+    "question" : "Blijft u meestal in Nederland of gaat u ook naar het buitenland?",
+    "answertype" : "CH",
+    "choices" : ["buitenland","Nederland"],
+    "conditions" : [
+      {
+        "id": "ll3",
+        "answer" : "ja"
+      }
+    ]
+  },
+  {
+    "id": "ll5",
+    "lvl1" : "lifestyle",
+    "lvl2" : "leisure",
+    "hv" : "holidays",
+    "question" : "Gaat u regelmatig op vakantie?",
+    "answertype" : "YN",
+    "conditions" : [
+      {
+        "id": "ll3",
+        "answer" : "ja"
+      }
+    ]
+  },
+  {
+    "id": "ll6",
+    "lvl1" : "lifestyle",
+    "lvl2" : "leisure",
+    "hv" : "sport",
+    "question" : "Doet u aan sporten?",
+    "answertype" : "YN",
+    "conditions" : []
+  },
+  {
+    "id": "ll7",
+    "lvl1" : "lifestyle",
+    "lvl2" : "leisure",
+    "hv" : "sport",
+    "question" : "Fietst u graag?",
+    "answertype" : "YN",
+    "conditions" : []
+  },
+  {
+    "id": "sc1",
+    "lvl1" : "social network",
+    "lvl2" : "family",
+    "hv" : "nearness",
+    "question" : "Woont uw naaste familie bij u in de buurt?",
+    "answertype" : "YN",
+    "conditions" : []
+  },
+  {
+    "id": "sc2",
+    "lvl1" : "social network",
+    "lvl2" : "family",
+    "hv" : "nearness",
+    "question" : "Hebt u goed contact met uw naaste familie?",
+    "answertype" : "YN",
+    "conditions" : []
+  },
+  {
+    "id": "sc3",
+    "lvl1" : "social network",
+    "lvl2" : "family",
+    "hv" : "nearness",
+    "question" : "Bent u getrouwd?",
+    "answertype" : "YN",
+    "conditions" : []
+  },
+  {
+    "id": "sc4",
+    "lvl1" : "social network",
+    "lvl2" : "family",
+    "hv" : "nearness",
+    "question" : "Heeft u kinderen?",
+    "answertype" : "YN",
+    "conditions" : []
+  },
+  {
+    "id": "lq1",
+    "lvl1" : "life quality",
+    "lvl2" : "health",
+    "hv" : "physical health",
+    "question" : "Welk cijfer zou u uw lichamelijke gezondheid willen geven op een schaal van 0 tot 10?",
+    "answertype" : "CH",
+    "choices" : ["een","twee","drie","vier","vijf","zes","zeven","acht","negen","tien"],
+    "conditions" : []
+  }
+
+
+]
+

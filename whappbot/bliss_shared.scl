@@ -1,0 +1,208 @@
+# Author: Jelte van Waterschoot
+# Group: Human Media Interaction, University of Twente
+# Contact: j.b.vanwaterschoot@utwente.nl
+
+? BLOCK resetData
+    #Generic
+    ? text = ""
+    ? emphasis = 0
+    ? reply = NULL
+    ? index = -1    
+    ? questionList = [{"name": "Wat is uw naam?"},{"birthyear":"Wanneer bent u geboren?"},{"birthplace":"Waar bent u geboren?"},{"childhoodplace":"Waar bent u opgegroeid?"},{"old_games":"Wat vond u vroeger leuk om te doen als kind?"},{"new_games":"Wat vindt u nu leuk om te doen?"}]
+    ? selfdiscloseList = [{"name":"Mijn naam is Babbelbot."},{"birthyear":"Ok! Mijn eerste versie bestond in 2019"},{"birthplace":"Die plek ken ik wel. Ik ben zelf gemaakt door onderzoekers uit Nederland."},{"childhoodplace":"Dat lijkt me mooi om daar op te groeien. Ik ben zelf net gecreëerd, dus ben nog bezig met opgroeien."},{"old_games":"Leuk! Ik vind zelf galgje wel een leuk spel."},{"new_games":"Interessant! Vooral praten met andere mensen en nieuwe dingen over ze leren vind ik leuk."}]
+    ? record = 0
+    ? agent_speech = 0
+    ? user_speech = 0
+    # RS
+    ? rsurl = "https://tts.readspeaker.com/a/speak?"
+    ? rsvoice = "Guus"
+    ? rslang = "nl_nl"
+    ? rsstreaming = "0"
+    ? rsformat = "mp3"
+    # spaCy
+    ? length = 0    
+    ? lang = "nl"
+    # Wit version
+    ? version = "20210118"
+    ? url = "https://api.wit.ai/speech?v="+version
+
+# Method for calling a wait in seconds
+? BLOCK wait
+    ? _url = bliss_secrets:urlspaCy+"/wait?length=" + length
+    ? _body = GET {'url': _url, 'headers': {'Content-Type' : 'application/json'}}    
+    ? reply = _body['body']    
+
+# Method for stripping diacritics from accented words
+? BLOCK decode
+    ? _url = bliss_secrets:urlspaCy+"/decode?text=" + text
+    ? _body = GET {'url': _url, 'headers': {'Content-Type' : 'application/json'}}
+    ? reply = _body['body']    
+
+# Method for counting the number of words in a piece of text, based on tokenization of spaCy
+? BLOCK numberOfWords
+    ? _url = bliss_secrets:urlspaCy+"/words?text=" + text + "&lang="+rslang
+    ? _body = GET {'url': _url, 'headers': {'Content-Type' : 'application/json'}}
+    ? reply = _body['body']    
+
+# Method for speaking the text with USS voice
+? BLOCK speakText
+    # set Delay
+    ? INSERT BLOCK:getDelay
+    # construct GET request and retrieve TTS file    
+    ? _urlTTS = rsurl+"text="+text+"&key="+bliss_secrets:rskey+"&lang="+rslang+"&voice="+rsvoice+"&streaming="+rsstreaming+"&audioformat="+rsformat    
+    ? _response = GET{ 'url': _urlTTS, 'headers': {'Content-Type' : 'application/json'} }
+    ? _audioId = _response['body']            
+    ? LISTEN _audioId    
+    ? IF record = 0    
+        ? bliss_data_sd:profile['log'] := {'self': {'audio':NULL, 'text':text}}    
+    ? ELSE
+        ? bliss_data_sd:profile['log'] := {'self': {'audio':_audioId, 'text':text}}        
+    # text : de zin
+    ? IF agent_speech = 1
+        <<text>>
+    ? SET {'delay': delay}  
+
+? BLOCK getDelay
+    ? _urlTTS = rsurl+"text="+text+"&key="+bliss_secrets:rskey+"&lang="+rslang+"&voice="+rsvoice+"&streaming="+rsstreaming+"&audioformat="+rsformat    
+    # Retrieve and set length for utterance
+    ? _response = GET{ 'url': _urlTTS +"&command=events", 'headers': {'Content-Type' : 'application/json'}}
+    ? _events = _response['body']['events']
+    ? _length = LENGTH _events
+    ? delay = PARSE _events[_length-1]['time_ms']   
+
+#Method for speaking text with neural voice, with possibility for emphasis tags
+? BLOCK speakTextWithEmphasis
+    # ReadSpeaker parameters    
+    # INPUT
+    # TODO: retrieve length for neural TTS, now this is done with calling the old API
+    ? INSERT BLOCK:getDelay
+    # text : de zin
+    ? IF emphasis = 0 OR emphasis = NULL
+        ? ssml = "<speak+xml:lang='nl'>"+text+".</speak>"
+    ? ELSE
+        ? ssml = "<speak+xml:lang='nl'><emphasis%20level='strong'>"+text+"</emphasis></speak>"
+    ? _urlTTS = bliss_secrets:rsneural+"&lang="+rslang+"&voice="+rsvoice+"&streaming="+rsstreaming+"&audioformat="+rsformat+"&textformat=ssml"+"&text="+ssml+"&volume=250"
+    # Test with 
+    ? _response = GET{ 'url': _urlTTS, 'headers': {'Authorization': bliss_secrets:rsauth, 'Content-Type' : 'application/json'}}
+    ? _audioId = _response['body']            
+    ? LISTEN _audioId        
+    ? IF record = 0    
+        ? bliss_data_sd:profile['log'] := {'self': {'audio':NULL, 'text':text}}    
+    ? ELSE
+        ? bliss_data_sd:profile['log'] := {'self': {'audio':_audioId, 'text':text}}    
+    ? IF agent_speech = 1
+        <<text>>
+    ? SET {'delay': delay/2}    
+
+? BLOCK getSentiment
+    # URL spacy parser
+    # POST/GET needs to best up on a server    
+    ? _url = bliss_secrets:urlspaCy+"/sentiment?text="+text+"&lang="+lang
+    ? _body = GET {'url': _url, 'headers': {'Content-Type' : 'application/json'}}    
+    ? reply = _body['body']
+
+? BLOCK getNPS
+    # URL spacy parser
+    # POST/GET needs to best up on a server    
+    ? _url = bliss_secrets:urlspaCy+"/nps?text="+text+"&lang="+lang
+    ? _body = GET {'url': _url, 'headers': {'Content-Type' : 'application/json'}}    
+    ? reply = _body['body']
+
+? BLOCK getVPS
+    # URL spacy parser
+    # POST/GET needs to best up on a server    
+    ? _url = bliss_secrets:urlspaCy+"/vps?text="+text+"&lang="+lang
+    ? _body = GET {'url': _url, 'headers': {'Content-Type' : 'application/json'}}    
+    ? reply = _body['body']
+
+? BLOCK getASRTranscript    
+    # ASR    
+    ? _clip = ASK AUDIO
+    ? _wav = FORMAT {'file': _clip, 'format': 'wav'}
+    ? DELETE _clip
+    ? _body = POST {'url': bliss_secrets:urlASR, 'file': _wav, 'noHeaders': 1 }
+    ? reply = PARSE _body['body']
+    # <<STRINGIFY reply>>
+    ? IF reply['status'] = 0
+        # Decoding for RASA DOESN'T WORK
+        # ? _copy = reply
+        # ? text = reply['hypotheses'][0]['utterance']        
+        # ? INSERT BLOCK:decode
+        # ? _copy['hypotheses'][0]['utterance'] = reply
+        # ? reply = _copy        
+        ? IF record = 0
+            ? bliss_data_sd:profile['log'] := {'other': {'audio':NULL, 'text':reply['hypotheses'][0]['utterance']}}
+        ? ELSE
+            ? bliss_data_sd:profile['log'] := {'other': {'audio':_wav, 'text':reply['hypotheses'][0]['utterance']}}
+        ? IF user_speech = 1       
+            ? SEND {'data':reply['hypotheses'][0]['utterance'],'by':'player'}
+    ? ELSE
+        ? _typeMessage = "Sorry, kun je het antwoord typen?"
+        <<_typeMessage>>
+        ? text = ASK TEXT
+        # Decoding for RASA DOESN'T WORK
+        # ? INSERT BLOCK:decode
+        ? _fakeHypotheses = '[{"utterance":"'+text+'"}]'
+        ? reply['hypotheses'] = PARSE _fakeHypotheses           
+        # <<STRINGIFY reply>>
+    # Clean up text
+    ? text = ""         
+
+? BLOCK getWitReplySpeech        
+    # Getting intent from audio
+    ? _clip = ASK AUDIO
+    ? _mp3 = FORMAT {"file": _clip, "format": "mp3"}
+    ? DELETE _clip
+    ? reply = POST {"url": url, "headers": {"Authorization": "Bearer "+bliss_secrets:token}, "file": _mp3, 'Content-Type' : 'application/json'} 
+    ? DELETE _mp3
+
+? BLOCK getWitReplyText   
+    ? _urlWit = url+"&q="+text
+    # Getting intent from text
+    ? reply = GET {"url": _urlWit, "headers": {"Authorization": "Bearer "+bliss_secrets:token}, 'Content-Type' : 'application/json'}    
+
+? BLOCK getWitTraits
+    ? IF reply['statusCode'] = 200
+        ? _response = PARSE reply['body']
+        ? _intents = _response['traits']
+
+? BLOCK getWitEntities
+    ? IF reply['statusCode'] = 200
+        ? _response = PARSE reply['body']
+        ? _intents = _response['traits']
+
+? BLOCK getWitIntent
+    ? IF reply['statusCode'] = 200
+        ? _response = PARSE reply['body']
+        ? _intents = _response['intents']
+    ? ELSE
+        ? SEND {'data': 'Api-call niet gelukt', 'by': 'status'}
+        Statuscode: <<reply['statusCode']>>
+        Message: <<reply['message']>>
+
+? BLOCK getRASAToken
+    # Get the token to get access to the NLU component
+    ? _url = "https://bliss.cls.ru.nl/api/auth"
+    ? reply = POST {'url': _url, 'body': {"username":bliss_secrets:rasaUsername,"password":bliss_secrets:rasaPassword}, 'headers': {'Content-Type' : 'application/json'}}
+    ? token = reply['body']['access_token']
+
+? BLOCK getRASANLU
+    # Get the intent from a RASA X server
+    ? INSERT BLOCK:getRASAToken
+    ? _body = POST {'url': bliss_secrets:urlNLU + text, 'headers': {'Authorization': 'Bearer '+token}}   
+    ? reply = PARSE _body['body']
+
+? BLOCK getRASAResponse
+    # POST/GET needs to best up on a server
+    ? _body = {'message':text}
+    ? _response = POST {'url': bliss_secrets:urlResponse, 'body': _body, 'headers': {'Content-Type' : 'application/json'}}
+    ? reply = _response['body'][0]    
+    
+? BLOCK question
+    # This will ask a question from a list. Later to be replace with a question generation module.
+    ? IF index >= 0
+        ? reply = questionList[index]
+
+? BLOCK selfdisclose
+    ? IF index >= 0
+        ? reply = selfdiscloseList[index]

@@ -1,0 +1,20 @@
+{
+  "middleware": {
+    "loaderClass": "nl.utwente.hmi.middleware.activemq.ActiveMQMiddlewareLoader",
+    "properties": {
+      "iTopic": "BLISS/out",
+      "oTopic": "BLISS/in",
+      "amqBrokerURI": "tcp://localhost:61616"
+    }
+  },
+  "realizer": {
+    "type": "Google",
+    "properties": {
+      "languageCode": "en-GB",
+      "name": "en-GB-Wavenet-B",
+      "ssmlGender": "MALE",
+      "audioEncoding": "LINEAR16"
+    },
+    "url": "https://texttospeech.googleapis.com/v1/"
+  }
+}

@@ -1,0 +1,82 @@
+[
+  {
+    "id": 1,
+    "intent": "greeting",
+    "keywords": {
+      "exists": ["hallo","hoi","goedemorgen","goedemiddag","goede dag"]
+    }
+  },
+  {
+    "id": 2,
+    "intent" : "valediction",
+    "keywords": {
+      "exists":["tot ziens", "doei", "tot later"],
+      "exactly": ["dag", "fijne dag"]
+    }
+  },
+  {
+    "id": 3,
+    "intent": "repeat",
+    "keywords": {
+      "exactly": ["wat zei je","kun je dat herhalen","ik begrijp je niet", "ik snap je niet"]
+    }
+  },
+  {
+    "id" : 4,
+    "intent": "confirm",
+    "keywords": {
+      "exists": ["jazeker","inderdaad","yes","zeker"],
+      "exactly" : ["klopt"],
+      "starts" :["ja"]
+    }
+  },
+  {
+    "id": 5,
+    "intent": "disconfirm",
+    "keywords": {
+      "exists":["nope", "niet echt","nee"],
+      "exactly":["nooit","niets","niks"]
+    }
+  },
+  {
+    "id": 6,
+    "intent": "stalling",
+    "keywords": {
+      "exactly":["uhm", "uh", "mmm", "oh", "tsja","ah"]
+    }
+  },
+  {
+    "id":7,
+    "intent":"backchannel",
+    "keywords":{
+      "exactly":["uhu", "oké"]
+    }
+  },
+  {
+    "id" : 8,
+    "intent": "inform",
+    "keywords": []
+  },
+  {
+    "id": 9,
+    "intent": "question",
+    "keywords" : {
+      "starts": ["wat","hoe","waarom","wanneer","wie","waar","hoezo"]      
+    }
+  },
+  {
+    "id": 10,
+    "intent": "pausing",
+    "interaction": {
+      "timeoutFrequency": 1
+    }
+  },
+  {
+    "id": 11,
+    "intent": "contact",
+    "keywords": {
+      "exists": ["ik ben er"]
+    }
+
+  }
+]

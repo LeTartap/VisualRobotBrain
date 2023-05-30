@@ -1,0 +1,141 @@
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.github.jengelman.gradle.plugins:shadow:4.0.2'
+    }
+}
+
+apply plugin: 'com.github.johnrengelman.shadow'
+apply plugin: 'java'
+apply plugin: 'application'
+
+group 'nl.bliss'
+version '1.0-SNAPSHOT'
+
+sourceCompatibility = 1.8
+mainClassName = "nl.bliss.gui.BLISS"
+
+repositories {
+    mavenCentral()
+    maven { url 'https://jitpack.io' }
+    flatDir {
+        dirs 'lib'
+    }
+}
+
+task (runASR, type: JavaExec){
+    main = "nl.bliss.external.asr.NLSpraakASR"
+    classpath = sourceSets.main.runtimeClasspath
+    if(project.hasProperty("ws")){
+        args Eval.me(ws)
+    }
+    if(project.hasProperty("mw")){
+        args Eval.me(mw)
+    }
+    if(project.hasProperty("file")){
+        args Eval.me(file)
+    }
+    if(project.hasProperty("asr")){
+        args(asr.split(' '))
+    }
+}
+
+task (runTTS, type: JavaExec){
+    main = "nl.bliss.external.tts.ReadSpeakerMWTTS"
+    classpath = sourceSets.main.runtimeClasspath
+    if(project.hasProperty("api")){
+        args Eval.me(api)
+    }
+    if(project.hasProperty("file")){
+        args Eval.me(file)
+    }
+    if(project.hasProperty('tts')){
+        args(tts.split(' '))
+    }
+}
+
+task(runApp, type: JavaExec){
+    classpath = sourceSets.main.runtimeClasspath
+    main = project.hasProperty("mainClass") ? project.getProperty("mainClass") : "nl.bliss.Main"
+}
+
+task(runBLISS, type: JavaExec){
+    main = "nl.bliss.gui.BLISS"
+    classpath = sourceSets.main.runtimeClasspath
+    if(project.hasProperty('ba')){
+        args(ba.split(' '))
+    }
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+    options.compilerArgs << '-Xlint:unchecked'
+    options.deprecation = true
+}
+
+dependencies {
+    implementation 'com.google.code.gson:gson:2.10.1'
+    runtimeOnly fileTree(dir: 'lib', include: '*.jar')
+    //Testing and logging
+    // https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api
+    implementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.8.1'
+    implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
+
+    //util
+    implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.9'
+    // https://mvnrepository.com/artifact/commons-io/commons-io
+    implementation group: 'commons-io', name: 'commons-io', version: '2.6'
+    implementation group: 'org.apache.activemq', name: 'activemq-broker', version: '5.15.9'
+    //Time stuff
+    implementation 'net.time4j:time4j-base:5.7'
+    implementation 'net.time4j:time4j-tzdata:5.0-2020a'
+    // https://mvnrepository.com/artifact/com.joestelmach/natty
+    implementation group: 'com.joestelmach', name: 'natty', version: '0.13'
+
+    //dialog
+    implementation 'com.github.hmi-utwente:Flipper-2.0:1.0'
+    implementation name: 'middleware-0.1'
+
+    //ie
+    implementation name: 'matcher-1.0-SNAPSHOT'
+    implementation group: 'info.debatty', name: 'java-string-similarity', version: '0.10'
+
+    //http requests
+    implementation group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.7.2'
+
+    //nlg
+    // https://mvnrepository.com/artifact/uk.ac.abdn/SimpleNLG
+//    compile group: 'uk.ac.abdn', name: 'SimpleNLG', version: '4.4.8'
+//    compile 'com.github.rfdj:SimpleNLG-NL:1.1'
+    implementation name: 'SimpleNLG-NL-1.1'
+
+    //nlu
+    // https://mvnrepository.com/artifact/edu.stanford.nlp/stanford-corenlp
+//    implementation group: 'edu.stanford.nlp', name: 'stanford-corenlp', version: '4.0.0'
+
+    //rfid
+    implementation 'com.fazecast:jSerialComm:2.6.2'
+
+    //Google Speech components
+    // https://mvnrepository.com/artifact/com.google.cloud/google-cloud-texttospeech
+    implementation group: 'com.google.cloud', name: 'google-cloud-texttospeech', version: '1.2.3'
+    // https://mvnrepository.com/artifact/com.google.cloud/google-cloud-speech
+    implementation group: 'com.google.cloud', name: 'google-cloud-speech', version: '1.24.6'
+    // api enforcedPlatform('com.google.cloud:libraries-bom:5.4.0')
+    // https://mvnrepository.com/artifact/com.google.cloud/libraries-bom
+    implementation group: 'com.google.cloud', name: 'libraries-bom', version: '15.0.0', ext: 'pom'
+
+
+    //MaryTTS NOT SUPPORTED ANYMORE, REPO NOT AVAILABLE
+    // implementation group: 'de.dfki.mary', name: 'marytts-client', version: '5.2'
+    
+
+    //Spraak
+    implementation name: 'Spraak-1.0'
+    implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.9.9'
+
+
+
+}

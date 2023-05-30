@@ -1,0 +1,567 @@
+<behaviourtemplates>
+    <is name="components">
+        {
+            "mw":{
+                "initialized": false,
+                "requestQueue" : [],
+                "response" : {},
+                "messages" : {}
+            },
+            "asr": {
+                "initialized" : false,
+                "messages" : {}
+            },
+            "tts": {
+                "initialized" : false,
+                "requestQueue" : [],
+                "response" : {},
+                "messages" : {}
+            },
+            "um" : {
+                "initialized" : false,
+                "requestQueue":[],
+                "response": {},
+                "messages": {}
+            },
+            "nvlg": {
+                "initialized" : false,
+                "requestQueue" : [],
+                "response" : {},
+                "messages" : {}
+            },
+            "nvlu": {
+                "initialized": false,
+                "requestQueue" : [],
+                "response" : {},
+                "messages" : {}
+            },
+            "auth":{
+                "initialized": false,
+                "requestQueue" : [],
+                "response" : {},
+                "messages" : {}
+            },
+            "gui":{
+                "initialized": false,
+                "requestQueue" : [],
+                "response" : {},
+                "messages" : {}
+            }
+        }
+    </is>
+
+    <javascript><![CDATA[
+
+        var MW = (function(){
+            var handleMWResponse = function(res) {
+                is.floor.time = Date.now();
+                //print("Messages (MW): " + JSON.stringify(res));
+                if(res.params.hasOwnProperty("typed")){
+                        is.dialog.chatOnly = res.params.typed;
+                        is.floor.timePassed = false;
+                        is.floor.timeoutFrequency = 0;
+                }
+                else{
+                    is.dialog.chatOnly = false;
+                }
+                if(res.params.hasOwnProperty("cmd") && res.params.cmd == "update"){
+                    UM.updatePerson({id:res.params.id,type:res.params.type,value:res.params.value});
+                    UM.MakeRequests("update");
+                }
+                else if(res.params.hasOwnProperty("type") && res.params.type == "final" ){
+                    is.dialog.user.isTalking = false;
+                    is.floor.timeoutFrequency = 0;
+                    if(!is.dialog.agent.isTalking){
+                        is.components.asr.messages = res.params;
+                    }
+                }
+                else if(res.params.hasOwnProperty("type") && res.params.type == "inc"){
+                    is.floor.timeoutFrequency = 0;
+                    is.dialog.user.isTalking = true;
+                }
+                else if(res.params.hasOwnProperty("type") && res.params.type == "auth"){
+                    is.floor.timeoutFrequency = 0;
+                    is.components.auth.messages = res.params;
+                }
+                else if(res.params.hasOwnProperty("tts") && res.params.tts.type == "feedback"){
+                    is.components.tts.messages = res.params;
+                    //print("Agent is " + is.components.tts.messages.tts.isTalking);
+                    is.dialog.agent.isTalking = is.components.tts.messages.tts.isTalking;
+                    is.dialog.chatOnly = false;
+                }
+                else{
+                    print("Unknown message sent to the MW component: " +JSON.stringify(res));
+                }
+            }
+
+            function Init() {
+                ENV.register("mw_data", handleMWResponse);
+                return true;
+            }
+
+            return {
+                Init: Init
+            };
+        })();
+        
+        var GUI = (function() {
+            var handleGUIResponse = function(res) {
+                is.components.gui.messages = res.params;
+                //print("Messages: (GUI)" + JSON.stringify(is.components.gui.messages));
+            }
+
+            var handleUpdateGUIResponse = function(res){
+                var element;
+                if(is.components.gui.requestQueue.length > 0){
+                    for(i = 0; i < is.components.gui.requestQueue.length; i++){
+                        if(is.components.gui.requestQueue[i].response.requestId === res.msgId){
+                            is.components.gui.messages = res.params;
+                            element = i;
+                        }
+                    }
+                }
+                is.components.gui.requestQueue.splice(element,1);
+
+            }
+
+            var updateGUI = function(message){
+                //print("Making updateGUI request for: " + JSON.stringify(message));
+                is.components.gui.requestQueue.push({content : message});
+                return message;
+            }
+
+            //Send requests to the environment
+            var MakeRequests = function(type) {
+                for (var i=0; i < is.components.gui.requestQueue.length; i++) {
+                    if (is.components.gui.requestQueue[i].response != null) continue;
+                    var requestId = ENV.queueMessage("gui", type, is.components.gui.requestQueue[i]);
+                    is.components.gui.requestQueue[i].response = {
+                       requestId: requestId
+                    };
+                    //print("Sent request to GUIEnv: "+requestId);
+                }
+            }
+
+            function Init() {
+                ENV.register("gui", handleGUIResponse);
+                ENV.register("update",handleUpdateGUIResponse);
+                return true;
+            }
+
+            return {
+                Init: Init,
+                MakeRequests: MakeRequests,
+                updateGUI: updateGUI
+            };
+        })();
+
+        var AUTH = (function() {
+            var handleAUTHResponse = function(res) {
+                is.components.auth.messages = res.params;
+                //print("Messages: (AUTH)" + JSON.stringify(is.components.auth.messages));
+            }
+
+            function Init() {
+                ENV.register("auth", handleAUTHResponse);
+                return true;
+            }
+
+            return {
+                Init: Init
+            };
+        })();
+
+        var UM = (function(){
+
+             var handleUMTopicResponse = function(res){
+                var element;
+                if(is.components.um.requestQueue.length > 0){
+                    for(i = 0; i < is.components.um.requestQueue.length; i++){
+                        if(is.components.um.requestQueue[i].response.requestId === res.msgId){
+                            is.components.um.messages = res.params;
+                            element = i;
+                        }
+                    }
+                }
+                is.components.um.requestQueue.splice(element,1);
+                //print("Messages (Topic): " + JSON.stringify(is.dialog.topics));
+            }
+
+            var MakeUMTopicRequest = function(message){
+                //print("Adding topics");
+                is.components.um.requestQueue.push({nvlu :message});
+                return message;
+            }
+
+            var updateUser = function(message){
+                //print("Adding information about user: " + JSON.stringify(is.dialog.user.information));
+                is.components.um.requestQueue.push({content: message});
+            }
+
+            //Adding a UM update request to the queue to send
+            var updatePerson = function(message){
+                //print("Making updatePerson request for: " + JSON.stringify(message));
+                is.components.um.requestQueue.push({content : message});
+                //return message;
+            }
+
+            //Adding a UM add request to the queue to send
+            var addPerson = function(message){
+                //print("Making addPerson request for: " + JSON.stringify(message));
+                is.components.um.requestQueue.push({content : message});
+                return message;
+            }
+            
+            //Check in the UM if there is a person with given ID
+            var hasPerson = function(message) {
+                //print("Making hasPerson request for: " + JSON.stringify(message));
+                is.components.um.requestQueue.push({content:message});
+                //print("Return message: "+ JSON.stringify(is.components.um));
+                return message;
+            }
+        
+            //Check in the UM if there is a person with given ID
+            var getPerson = function(message) {
+                //print("Making getPerson request for: " + JSON.stringify(message));
+                is.components.um.requestQueue.push({content:message});
+                return message;                
+            }
+
+            //Send requests to the environment
+            var MakeRequests = function(type) {
+                for (var i=0; i < is.components.um.requestQueue.length; i++) {
+                    if (is.components.um.requestQueue[i].response != null) continue;
+                    var requestId = ENV.queueMessage("um", type, is.components.um.requestQueue[i]);
+                    is.components.um.requestQueue[i].response = {
+                       requestId: requestId
+                    };
+                    //print("Sent request to UM: "+requestId);
+                }
+            }
+
+            var update = function(res){
+                var element;
+                if(is.components.um.requestQueue.length > 0){
+                    for(i = 0; i < is.components.um.requestQueue.length; i++){
+                        if(is.components.um.requestQueue[i].response.requestId === res.msgId){
+                            is.components.um.messages = res.params;
+                            element = i;
+                        }
+                    }
+                }
+                is.components.um.requestQueue.splice(element,1);
+            }
+        
+            var has = function(res) {
+                var element;
+                if(is.components.um.requestQueue.length > 0){
+                    for(i = 0; i < is.components.um.requestQueue.length; i++){
+                        if(is.components.um.requestQueue[i].response.requestId === res.msgId){
+                            is.components.um.messages = res.params;
+                            element = i;
+                        }
+                    }
+                }
+                is.components.um.requestQueue.splice(element,1);
+                //print("Messages: (UM + has)" + JSON.stringify(is.components.um.messages));
+            }
+
+            var get = function(res) {
+                var element;
+                if(is.components.um.requestQueue.length > 0){
+                    for(i = 0; i < is.components.um.requestQueue.length; i++){
+                        if(is.components.um.requestQueue[i].response.requestId === res.msgId){
+                            is.components.um.messages = res.params;
+                            if(is.components.um.messages.hasOwnProperty("person") && !_.isEmpty(is.components.um.messages.person)){
+                                //print("Messages: (UM + get)" + JSON.stringify(is.components.um.messages));
+                                is.dialog.user.information = is.components.um.messages.person;
+                            }
+                            element = i;
+                        }
+                    }
+                }
+                is.components.um.requestQueue.splice(element,1);
+                //print("Retrieving person: " + JSON.stringify(res));
+            }
+
+            function Init(){
+                ENV.register("get", get);
+                ENV.register("has", has);
+                ENV.register("update",update);
+                ENV.register("getTopics",handleUMTopicResponse);
+                return true;
+            }
+
+            return {
+                Init: Init,
+                MakeRequests: MakeRequests,
+                MakeUMTopicRequest: MakeUMTopicRequest,
+                hasPerson: hasPerson,
+                addPerson: addPerson,
+                getPerson: getPerson,
+                updatePerson: updatePerson,
+                updateUser: updateUser
+            };
+        })();
+
+        var TTS = (function(){
+
+            //Adding a TTS request to the queue to send
+            var MakeSpeakRequest = function(message){
+                //print("Making speak request for: " + JSON.stringify(message));
+                is.components.tts.requestQueue.push({content : message});
+                return message;
+            }
+
+            //Send requests to the environment
+            var MakeRequests = function(type) {
+                for (var i=0; i < is.components.tts.requestQueue.length; i++) {
+                    if (is.components.tts.requestQueue[i].response != null) continue;
+                    var requestId = ENV.queueMessage("tts", type, is.components.tts.requestQueue[i]);
+                    is.components.tts.requestQueue[i].response = {
+                       requestId: requestId
+                    };
+                    //print("Sent request to tts: "+requestId);
+                }
+            }
+
+            var handleTTSFeedback = function(res) {
+                //is.dialog.agent.isTalking = res.params.content.isTalking;
+                //print("Messages: (TTSFeedback)" + JSON.stringify(res.params));
+            }
+
+            var handleTTSPlay = function(res){
+                var element;
+                if(is.components.tts.requestQueue.length > 0){
+                    for(i = 0; i < is.components.tts.requestQueue.length; i++){
+                        if(is.components.tts.requestQueue[i].response.requestId === res.msgId){
+                            is.components.tts.messages = res.params;
+                            element = i;
+                        }
+                    }
+                }
+                is.components.tts.requestQueue.splice(element,1);
+                //print("Messages: (TTS)" + JSON.stringify(is.components.tts.messages));
+            }
+
+            function Init() {
+                ENV.register("feedback",handleTTSFeedback);
+                ENV.register("tts",handleTTSPlay);
+                return true;
+            }
+
+            return {
+                Init: Init,
+                MakeRequests: MakeRequests,
+                MakeSpeakRequest: MakeSpeakRequest,
+            };
+        })();
+
+        var NVLG = (function() {
+            var handleNVLGResponse = function(res) {
+                var element;
+                if(is.components.nvlg.requestQueue.length > 0){
+                    //Compare the message received to messages in the requestQueue
+                    for(i = 0; i < is.components.nvlg.requestQueue.length; i++){
+                        if(is.components.nvlg.requestQueue[i].response.requestId === res.msgId){
+                            is.components.nvlg.messages = res.params;
+                            if(is.components.nvlg.messages.hasOwnProperty("turn") && is.components.nvlg.messages.turn === "keep")
+                            {
+                                is.floor.agent.keep = true;
+                            }
+                            element = i;
+                        }
+                    }
+                }
+                // Remove the message from the queue, once it is processed.
+                is.components.nvlg.requestQueue.splice(element,1);
+                //print("Messages: (NVLG)" + JSON.stringify(is.components.nvlg.messages));
+            }
+
+            var handleTurnResponse = function(res){
+                //print("Messages: (NVLG Turn Update)" + JSON.stringify(res.params));
+                is.components.nvlg.messages = res.params;
+                if(is.components.nvlg.messages === "keep"){
+                    //print("Agent keeps turn");
+                    is.floor.agent.keep = true;
+                }
+            }
+
+            var handleResetResponse = function(res){
+                var element;
+                if(is.components.nvlg.requestQueue.length > 0){
+                    for(i = 0; i < is.components.nvlg.requestQueue.length; i++){
+                        if(is.components.nvlg.requestQueue[i].response.requestId === res.msgId){
+                            is.components.nvlg.messages = res.params;
+                            element = i;
+                        }
+                    }
+                }
+                is.components.nvlg.requestQueue.splice(element,1);
+                //print("Messages: (NVLG Erase Update)" + JSON.stringify(res.params));
+            }
+
+            //Send requests to the environment
+            var MakeRequests = function(type) {
+                for (var i=0; i < is.components.nvlg.requestQueue.length; i++) {
+                    if (is.components.nvlg.requestQueue[i].response != null) continue;
+                    var requestId = ENV.queueMessage("nvlg", type, is.components.nvlg.requestQueue[i]);
+                    is.components.nvlg.requestQueue[i].response = {
+                       requestId: requestId
+                    };
+                    //print("Sent request to NVLG: "+requestId);
+                }
+            }
+
+            var MakeNVLGRequest = function(message){
+                //print("Making NVLG request for: " + JSON.stringify(message));
+                is.components.nvlg.requestQueue.push({content:message});
+                return message;
+            }
+        
+            var ErasePastIntents = function(message){
+                //print("Clearing up past intents");
+                is.components.nvlg.requestQueue.push({content:message});
+                return message;
+            }
+
+            function Init() {
+                ENV.register("nvlg", handleNVLGResponse);
+                ENV.register("turn",handleTurnResponse);
+                ENV.register("reset",handleResetResponse);
+                return true;
+            }
+
+            return {
+                Init: Init,
+                MakeRequests: MakeRequests,
+                MakeNVLGRequest: MakeNVLGRequest,
+                ErasePastIntents: ErasePastIntents
+            };
+        })();
+
+        var NVLU = (function(){
+
+            //Listener for intents and contents from the user
+            var handleNVLUResponse = function(res) {
+                var element;
+                if(is.components.nvlu.requestQueue.length > 0){
+                    for(i = 0; i < is.components.nvlu.requestQueue.length; i++){
+                        if(is.components.nvlu.requestQueue[i].response.requestId === res.msgId){
+                            is.components.nvlu.messages = res.params;
+                            element = i;
+                        }
+                    }
+                }
+                is.components.nvlu.requestQueue.splice(element,1);
+                //print("Messages (NVLU): " + JSON.stringify(is.components.nvlu.messages));
+            }
+
+             //Add a NVLU request
+             var MakeNVLURequest = function(message){
+                //print("Making NVLU request for: " + JSON.stringify(message));
+		        is.components.nvlu.requestQueue.push({content : message});
+		        return message;
+             }
+
+             //Function for making the requests
+             var MakeRequests = function(type) {
+    	        for (var i=0; i < is.components.nvlu.requestQueue.length; i++) {
+		            if (is.components.nvlu.requestQueue[i].response != null)
+		                continue;
+                    var requestId = ENV.queueMessage("nvlu", type, is.components.nvlu.requestQueue[i]);
+		            is.components.nvlu.requestQueue[i].response = {
+		                requestId: requestId
+		            };
+	            //print("Sent request to NVLU: "+requestId);
+		        }
+	        }
+
+	      //Register all the listeners
+             function Init() {
+                ENV.register("nvlu", handleNVLUResponse);
+                //ENV.register("topics",handleNVLUTopicResponse);
+                return true;
+             }
+
+             return {
+                Init: Init,
+                MakeRequests: MakeRequests,
+                MakeNVLURequest: MakeNVLURequest,
+                //MakeNVLUTopicRequest: MakeNVLUTopicRequest
+             };
+	    })();
+
+    ]]></javascript>
+
+    <template id="mwinit">
+        <preconditions>
+            <condition><![CDATA[ ENV.isInitialized()]]></condition>
+            <condition><![CDATA[!is.components.mw.initialized]]></condition>
+        </preconditions>
+        <effects>
+            <assign is="is.components.mw.initialized">MW.Init();</assign>
+        </effects>
+    </template>
+
+    <template id="nvlginit">
+        <preconditions>
+            <condition><![CDATA[ ENV.isInitialized()]]></condition>
+            <condition><![CDATA[!is.components.nvlg.initialized]]></condition>
+        </preconditions>
+        <effects>
+            <assign is="is.components.nvlg.initialized">NVLG.Init();</assign>
+        </effects>
+    </template>
+
+    <template id="nvluinit">
+        <preconditions>
+            <condition><![CDATA[ ENV.isInitialized()]]></condition>
+            <condition><![CDATA[!is.components.nvlu.initialized]]></condition>
+        </preconditions>
+        <effects>
+            <assign is="is.components.nvlu.initialized">NVLU.Init();</assign>
+        </effects>
+    </template>
+
+    <template id="uminit">
+        <preconditions>
+            <condition><![CDATA[ ENV.isInitialized()]]></condition>
+            <condition><![CDATA[!is.components.um.initialized]]></condition>
+        </preconditions>
+        <effects>
+            <assign is="is.components.um.initialized">UM.Init();</assign>
+        </effects>
+    </template>
+
+    <template id="ttsinit">
+        <preconditions>
+            <condition><![CDATA[ ENV.isInitialized()]]></condition>
+            <condition><![CDATA[!is.components.tts.initialized]]></condition>
+        </preconditions>
+        <effects>
+            <assign is="is.components.tts.initialized">TTS.Init();</assign>
+        </effects>
+    </template>
+
+    <template id="authinit">
+        <preconditions>
+            <condition><![CDATA[ ENV.isInitialized()]]></condition>
+            <condition><![CDATA[!is.components.auth.initialized]]></condition>
+        </preconditions>
+        <effects>
+            <assign is="is.components.auth.initialized">AUTH.Init();</assign>
+        </effects>
+    </template>
+    
+     <template id="guiinit">
+        <preconditions>
+            <condition><![CDATA[ ENV.isInitialized()]]></condition>
+            <condition><![CDATA[!is.components.gui.initialized]]></condition>
+        </preconditions>
+        <effects>
+            <assign is="is.components.gui.initialized">GUI.Init();</assign>
+        </effects>
+    </template>
+
+</behaviourtemplates>

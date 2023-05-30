@@ -1,0 +1,350 @@
+[
+  {
+    "id": 1,
+    "intent": "greeting",
+    "content": "Hallo! Heb je wel eens tegen een computer gepraat die terug praat?",
+    "turn": "assign",
+    "unique":true,
+    "conditions": [
+      {
+        "first":true
+      }
+    ]
+  },
+  {
+    "id": 17,
+    "intent": "greeting",
+    "content": "Hallo! Wij hebben al eens gesproken! Hoe gaat het?",
+    "turn": "assign",
+    "unique":true,
+    "conditions": [
+      {
+        "first":false
+      }
+    ]
+  },
+  {
+    "id": 2,
+    "intent": "question",
+    "content": "Nou, dan ben ik benieuwd naar welke dan.",
+    "turn": "assign",
+    "unique":true,
+    "conditions": [
+      {
+        "move": {
+          "agent": {
+            "id": 1
+          },
+          "user": {
+            "intent": "confirm"
+          }
+        },
+        "notmove": {
+          "agent": {
+            "id": 3
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": 3,
+    "intent": "inform",
+    "content": "Oh, dat is toevallig, ik heb ook nooit eerder met mensen gepraat.",
+    "turn": "keep",
+    "unique":true,
+    "conditions": [
+      {
+        "move": {
+          "agent": {
+            "id": 1
+          },
+          "user": {
+            "intent": "disconfirm"
+          }
+        },
+        "notmove": {
+          "agent": {
+            "id": 2
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": 4,
+    "intent": "inform",
+    "content": "Hoe vind je het om zo met mij te praten?",
+    "turn": "assign",
+    "unique":true,
+    "conditions": [
+      {
+        "move": {
+          "agent": {
+            "id": 2
+          },
+          "user": {
+            "intent": "inform"
+          }
+        }
+      },
+      {
+        "move": {
+          "agent": {
+            "id": 3
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id" : 5,
+    "intent": "inform",
+    "content": "Snap ik, ik ben ook heel eng.",
+    "turn": "keep",
+    "unique":true,
+    "conditions" :[ {
+      "move" : {
+        "agent": {
+          "id": 4
+        },
+        "user": {
+          "intent": "inform",
+          "emotion": [-1,-0.5]
+        }
+      },
+      "notmove": {
+        "agent": {
+          "id": [6,7]
+        }
+      }
+    }
+    ]
+  },
+  {
+    "id" : 6,
+    "intent": "inform",
+    "content": "Ik ben benieuwd hoe je het aan het einde van dit gesprek vindt.",
+    "turn": "keep",
+    "unique":true,
+    "conditions" : [{
+      "move" : {
+        "agent": {
+          "id": 4
+        },
+        "user": {
+          "intent": "inform",
+          "emotion": [-0.5,0.5]
+        }
+      },
+      "notmove": {
+        "agent": {
+          "id": [5,7]
+        }
+      }
+    }]
+  },
+  {
+    "id" : 7,
+    "intent": "inform",
+    "content": "Ik ga er van blozen!",
+    "turn": "keep",
+    "unique":true,
+    "conditions" : [
+      {
+        "move" : {
+          "agent": {
+            "id": 4
+          },
+          "user": {
+            "intent": "inform",
+            "emotion": [0.5,1.1]
+          }
+        },
+        "notmove": {
+          "agent": {
+            "id": [5,6]
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": 8,
+    "intent": "inform",
+    "content" : "Nu ben ik wel nieuwsgierig naar jou!",
+    "turn": "keep",
+    "unique":true,
+    "conditions": [
+      {
+        "move": {
+          "agent": {
+            "id": 5
+          }
+        }
+      },
+      {
+        "move": {
+          "agent": {
+            "id": 6
+          }
+        }
+      },
+      {
+        "move": {
+          "agent": {
+            "id": 7
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": 9,
+    "intent": "question",
+    "content": "Als je nu één ding mocht kiezen wat je komend weekend zou willen doen. Wat zou dat zijn?",
+    "turn": "assign",
+    "unique":true,
+    "conditions": [
+      {
+        "move": {
+          "agent": {
+            "id": 8
+          }
+        }
+      },
+      {
+        "move": {
+          "agent": {
+            "id": 17
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": 10,
+    "intent": "question",
+    "content": "Klinkt goed. Waarom vind je {{activity=dat}} leuk?",
+    "turn": "assign",
+    "unique":true,
+    "conditions": [{
+        "move": {
+          "agent": {
+            "id" : 9
+          },
+          "user": {
+            "intent": "inform"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": 11,
+    "intent": "question",
+    "content": "En als je nog een tweede activiteit zou mogen kiezen? Wat zou dat zijn?",
+    "turn": "assign",
+    "unique":true,
+    "conditions": [
+      {
+      "move": {
+        "agent": {
+          "id": 10
+        },
+        "user": {
+          "intent": "inform"
+        }
+      }
+    }]
+  },
+  {
+    "id": 12,
+    "intent": "question",
+    "content": "Wat zou je het meeste missen als je {{activity=dat}} niet zou doen?",
+    "turn": "assign",
+    "unique":true,
+    "conditions": [{
+      "move": {
+        "agent": {
+          "id": 11
+        },
+        "user": {
+          "intent": "inform"
+        }
+      }
+    }
+      ]
+  },
+  {
+    "id": 13,
+    "intent": "question",
+    "content": "Als je naar de afgelopen week kijkt. Welke activiteit vond je het allerleukst?",
+    "turn": "assign",
+    "unique":true,
+    "conditions": [{
+      "move": {
+        "agent": {
+          "id": 12
+        },
+        "user": {
+          "intent": "inform"
+        }
+      }
+    }
+      ]
+  },
+  {
+    "id": 14,
+    "intent" : "question",
+    "content": "Tof! Wat voor gevoel geeft {{activity=dat}} jou?",
+    "turn": "assign",
+    "unique":true,
+    "conditions": [{
+      "move": {
+        "agent": {
+          "id": 13
+        },
+        "user": {
+          "intent": "inform"
+        }
+      }
+    }
+      ]
+  },
+  {
+    "id": 15,
+    "intent": "question",
+    "content": "Dank je! Dat was het voor nu. Denk je nog steeds hetzelfde over mij?",
+    "turn": "assign",
+    "unique":true,
+    "conditions": [{
+      "move": {
+        "agent": {
+          "id": 14
+        },
+        "user": {
+          "intent": "inform"
+        }
+      }
+    }
+      ]
+  },
+  {
+    "id": 16,
+    "intent": "valediction",
+    "content": "Leuk dat je hebt meegedaan!",
+    "turn": "assign",
+    "unique":true,
+    "conditions": [{
+      "move": {
+        "agent": {
+          "id": 15
+        },
+        "user": {
+        }
+      }
+    }
+      ]
+  }
+]
