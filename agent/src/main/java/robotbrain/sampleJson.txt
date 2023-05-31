@@ -1,0 +1,341 @@
+{
+  "tag": "Information State",
+  "env": {
+    "temp": {
+      "newenvmsgs": [],
+      "newenvresponses": [],
+      "newenvoutmsgs": [
+        {
+          "environment": "um",
+          "cmd": "update",
+          "msgId": "bfawffcoeko1fe12k1gx7j",
+          "params": {
+            "content": {
+              "id": "david",
+              "type": "state",
+              "value": {
+                "tts": {
+                  "text": "Okay. Which friends do you like?",
+                  "timestamp": "2023-05-31-01-05-57-CEST",
+                  "moveID": 7
+                }
+              }
+            },
+            "response": {
+              "requestId": "bfawffcoeko1fe12k1gx7j"
+            }
+          }
+        }
+      ]
+    },
+    "initialized": true,
+    "initnoerror": true,
+    "environmentSpec": {
+      "environments": [
+        {
+          "id": "mw",
+          "loader": "nl.bliss.environments.GenericMiddlewareEnvironment",
+          "requiredloaders": [],
+          "params": {
+            "middleware": {
+              "loaderClass": "nl.utwente.hmi.middleware.activemq.ActiveMQMiddlewareLoader",
+              "properties": {
+                "iTopic": "BLISS/in",
+                "oTopic": "BLISS/out",
+                "amqBrokerURI": "tcp://localhost:61616"
+              }
+            }
+          }
+        },
+        {
+          "id": "gui",
+          "loader": "nl.bliss.environments.GUIEnvironment",
+          "requiredloaders": [
+            "mw"
+          ]
+        },
+        {
+          "id": "tts",
+          "loader": "nl.bliss.environments.TTSEnvironment",
+          "requiredloaders": [
+            "mw"
+          ],
+          "params": {
+            "realizer": {
+              "type": "ReadSpeaker",
+              "properties": {
+                "language": "en_us",
+                "voice": "James",
+                "streaming": "0",
+                "audioformat": "pcm"
+              }
+            }
+          }
+        },
+        {
+          "id": "um",
+          "loader": "nl.bliss.environments.UMEnvironment",
+          "requiredloaders": [
+            "mw"
+          ],
+          "params": {
+            "db": "default",
+            "name": "users",
+            "reset": false,
+            "event": "cb"
+          }
+        },
+        {
+          "id": "nvlg",
+          "loader": "nl.bliss.environments.NVLGEnvironment",
+          "requiredloaders": [
+            "um",
+            "tts"
+          ],
+          "params": {
+            "intents": "./behaviour/agentmoves_EN_CB.json",
+            "url": "http://things.ewi.utwente.nl:8190/",
+            "urlMemory": "http://things.ewi.utwente.nl:5000",
+            "language": "en"
+          }
+        },
+        {
+          "id": "nvlu",
+          "loader": "nl.bliss.environments.NVLUEnvironment",
+          "requiredloaders": [
+            "um"
+          ],
+          "params": {
+            "intents": "./behaviour/usermoves_EN.json",
+            "url": "http://things.ewi.utwente.nl:8190/",
+            "language": "en"
+          }
+        },
+        {
+          "id": "auth",
+          "loader": "nl.bliss.environments.AuthenticationEnvironment",
+          "requiredloaders": [],
+          "params": {
+            "identification": {
+              "type": "gui"
+            }
+          }
+        }
+      ]
+    }
+  },
+  "components": {
+    "mw": {
+      "initialized": true,
+      "requestQueue": [],
+      "response": {},
+      "messages": {}
+    },
+    "asr": {
+      "initialized": false,
+      "messages": {}
+    },
+    "tts": {
+      "initialized": true,
+      "requestQueue": [],
+      "response": {
+        "type": "text",
+        "parameters": {
+          "turn": "assign",
+          "emotion": "neutral",
+          "intent": "question",
+          "text": "Okay. Which friends do you like?",
+          "timestamp": "2023-05-31-01-05-57-CEST",
+          "id": 7
+        }
+      },
+      "messages": {
+        "tts": {
+          "isTalking": true,
+          "type": "feedback",
+          "timestamp": "2023-05-31-01-05-57-CEST"
+        }
+      }
+    },
+    "um": {
+      "initialized": true,
+      "requestQueue": [
+        {
+          "nvlu": {
+            "text": "hello can you hear me",
+            "intent": "inform",
+            "topics": {
+              "phrases": {
+                "NPS": [],
+                "VPS": [
+                  {
+                    "verb": "hear"
+                  }
+                ]
+              },
+              "events": [
+                {
+                  "A0": "hello you",
+                  "AM-MOD": "can",
+                  "V": "hear",
+                  "A1": "me"
+                }
+              ]
+            },
+            "emotion": {
+              "sentiment": {
+                "polarity": 0,
+                "intensity": 0
+              }
+            },
+            "timestamp": "2023-05-31-01-05-40-CEST"
+          },
+          "response": {
+            "requestId": "wr5r1xislqoa9esomj779a"
+          }
+        },
+        {
+          "nvlu": {
+            "text": "friends",
+            "intent": "inform",
+            "topics": {
+              "phrases": {
+                "NPS": [
+                  "friend"
+                ],
+                "VPS": []
+              },
+              "events": []
+            },
+            "emotion": {
+              "sentiment": {
+                "polarity": 0,
+                "intensity": 0
+              }
+            },
+            "timestamp": "2023-05-31-01-05-56-CEST"
+          },
+          "response": {
+            "requestId": "aqxf3mxt2zp8k6iq7csr8"
+          }
+        }
+      ],
+      "messages": {
+        "updated": true
+      }
+    },
+    "nvlg": {
+      "initialized": true,
+      "requestQueue": [],
+      "response": {
+        "type": "intent",
+        "content": {
+          "text": "friends",
+          "intent": "inform",
+          "topics": {
+            "phrases": {
+              "NPS": [
+                "friend"
+              ],
+              "VPS": []
+            },
+            "events": []
+          },
+          "emotion": {
+            "sentiment": {
+              "polarity": 0,
+              "intensity": 0
+            }
+          },
+          "timestamp": "2023-05-31-01-05-56-CEST"
+        },
+        "interaction": {
+          "turn": "",
+          "interrupt": "",
+          "timePassed": false,
+          "timeout": 10000,
+          "timeoutFrequency": 0,
+          "time": 1685487959394,
+          "agent": {
+            "wait": true,
+            "keep": false
+          }
+        }
+      },
+      "messages": {}
+    },
+    "nvlu": {
+      "initialized": true,
+      "requestQueue": [],
+      "response": {
+        "type": "final",
+        "text": "friends",
+        "confidence": 0.9678147,
+        "ctml": "",
+        "timestamp": "2023-05-31-01-05-56-CEST"
+      },
+      "messages": {}
+    },
+    "auth": {
+      "initialized": true,
+      "requestQueue": [],
+      "response": {},
+      "messages": {}
+    },
+    "gui": {
+      "initialized": true,
+      "requestQueue": [],
+      "response": {
+        "gui": [
+          {
+            "type": "id",
+            "value": "david"
+          },
+          {
+            "type": "recording",
+            "value": true
+          }
+        ]
+      },
+      "messages": {}
+    }
+  },
+  "dialog": {
+    "user": {
+      "move": {},
+      "respond": false,
+      "isTalking": false,
+      "id": "david",
+      "status": "",
+      "information": {
+        "name": "",
+        "age": ""
+      },
+      "personalized": ""
+    },
+    "agent": {
+      "move": {},
+      "questions": {
+        "asked": [],
+        "answered": []
+      },
+      "respond": true,
+      "isTalking": true
+    },
+    "chatOnly": false,
+    "greeted": false,
+    "closed": false
+  },
+  "floor": {
+    "turn": "",
+    "interrupt": "",
+    "timePassed": false,
+    "timeout": 10000,
+    "timeoutFrequency": 0,
+    "time": 1685487959394,
+    "agent": {
+      "wait": true,
+      "keep": false
+    }
+  }
+}

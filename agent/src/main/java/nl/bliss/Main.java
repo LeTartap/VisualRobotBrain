@@ -45,8 +45,7 @@ public class Main {
 
 //        Original flt
 //        flt = new FlipperLauncherThread(ps);
-//        flt.start();
-
+//          Custom visualizer
         flt = new FLTIsVisualizer(ps);
         flt.start();
     }
