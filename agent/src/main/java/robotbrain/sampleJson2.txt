@@ -1,0 +1,881 @@
+{
+  "tag": "Information State",
+  "env": {
+    "temp": {
+      "newenvmsgs": [],
+      "newenvresponses": [],
+      "newenvoutmsgs": [
+        {
+          "environment": "um",
+          "cmd": "update",
+          "msgId": "haq4gco9vvdyyeu5drbhc9",
+          "params": {
+            "content": {
+              "id": "",
+              "type": "state",
+              "value": {
+                "tts": {
+                  "text": "I've learned much about you! It was nice talking to you! Can we talk soon again? Bye!",
+                  "timestamp": "2023-06-02-21-21-57-CEST",
+                  "moveID": 8
+                }
+              }
+            },
+            "response": {
+              "requestId": "haq4gco9vvdyyeu5drbhc9"
+            }
+          }
+        }
+      ]
+    },
+    "initialized": true,
+    "initnoerror": true,
+    "environmentSpec": {
+      "environments": [
+        {
+          "id": "mw",
+          "loader": "nl.bliss.environments.GenericMiddlewareEnvironment",
+          "requiredloaders": [],
+          "params": {
+            "middleware": {
+              "loaderClass": "nl.utwente.hmi.middleware.activemq.ActiveMQMiddlewareLoader",
+              "properties": {
+                "iTopic": "BLISS/in",
+                "oTopic": "BLISS/out",
+                "amqBrokerURI": "tcp://localhost:61616"
+              }
+            }
+          }
+        },
+        {
+          "id": "gui",
+          "loader": "nl.bliss.environments.GUIEnvironment",
+          "requiredloaders": [
+            "mw"
+          ]
+        },
+        {
+          "id": "tts",
+          "loader": "nl.bliss.environments.TTSEnvironment",
+          "requiredloaders": [
+            "mw"
+          ],
+          "params": {
+            "realizer": {
+              "type": "ReadSpeaker",
+              "properties": {
+                "language": "en_us",
+                "voice": "James",
+                "streaming": "0",
+                "audioformat": "pcm"
+              }
+            }
+          }
+        },
+        {
+          "id": "um",
+          "loader": "nl.bliss.environments.UMEnvironment",
+          "requiredloaders": [
+            "mw"
+          ],
+          "params": {
+            "db": "default",
+            "name": "users",
+            "reset": false,
+            "event": "cb"
+          }
+        },
+        {
+          "id": "nvlg",
+          "loader": "nl.bliss.environments.NVLGEnvironment",
+          "requiredloaders": [
+            "um",
+            "tts"
+          ],
+          "params": {
+            "intents": "./behaviour/agentmoves_EN_CB.json",
+            "url": "http://things.ewi.utwente.nl:8190/",
+            "urlMemory": "http://things.ew"Fi.utwente.nl:5000",
+            "language": "en"
+          }
+        },
+        {
+          "id": "nvlu",
+          "loader": "nl.bliss.environments.NVLUEnvironment",
+          "requiredloaders": [
+            "um"
+          ],
+          "params": {
+            "intents": "./behaviour/usermoves_EN.json",
+            "url": "http://things.ewi.utwente.nl:8190/",
+            "language": "en"
+          }
+        },
+        {
+          "id": "auth",
+          "loader": "nl.bliss.environments.AuthenticationEnvironment",
+          "requiredloaders": [],
+          "params": {
+            "identification": {
+              "type": "gui"
+            }
+          }
+        }
+      ]
+    }
+  },
+  "components": {
+    "mw": {
+      "initialized": true,
+      "requestQueue": [],
+      "response": {},
+      "messages": {}
+    },
+    "asr": {
+      "initialized": false,
+      "messages": {}
+    },
+    "tts": {
+      "initialized": true,
+      "requestQueue": [],
+      "response": {
+        "type": "text",
+        "parameters": {
+          "turn": "assign",
+          "emotion": "neutral",
+          "intent": "valediction",
+          "text": "I've learned much about you! It was nice talking to you! Can we talk soon again? Bye!",
+          "timestamp": "2023-06-02-21-21-56-CEST",
+          "id": 8
+        }
+      },
+      "messages": {
+        "tts": {
+          "isTalking": true,
+          "type": "feedback",
+          "timestamp": "2023-06-02-21-21-57-CEST"
+        }
+      }
+    },
+    "um": {
+      "initialized": true,
+      "requestQueue": [
+        {
+          "nvlu": {
+            "text": "my name is David",
+            "intent": "inform",
+            "topics": {
+              "phrases": {
+                "NPS": [
+                  "my name",
+                  "David"
+                ],
+                "VPS": [
+                  {
+                    "verb": "be",
+                    "complement": "David"
+                  }
+                ]
+              },
+              "events": []
+            },
+            "emotion": {
+              "sentiment": {
+                "polarity": 0,
+                "intensity": 0
+              }
+            },
+            "timestamp": "2023-06-02-21-20-42-CEST"
+          },
+          "response": {
+            "requestId": "kj1h9j1ijyrzsy4sr9c1jk"
+          }
+        },
+        {
+          "nvlu": {
+            "text": "I would love to",
+            "intent": "inform",
+            "topics": {
+              "phrases": {
+                "NPS": [],
+                "VPS": [
+                  {
+                    "verb": "love"
+                  }
+                ]
+              },
+              "events": [
+                {
+                  "A0": "I",
+                  "AM-MOD": "would",
+                  "V": "love"
+                }
+              ]
+            },
+            "emotion": {
+              "sentiment": {
+                "polarity": 0.5,
+                "intensity": 0.6
+              }
+            },
+            "timestamp": "2023-06-02-21-21-00-CEST"
+          },
+          "response": {
+            "requestId": "hkdymz5hrdo6kh2y96gx"
+          }
+        },
+        {
+          "nvlu": {
+            "text": "yes",
+            "intent": "confirm",
+            "topics": {},
+            "emotion": {
+              "sentiment": {
+                "polarity": 0,
+                "intensity": 0
+              }
+            },
+            "timestamp": "2023-06-02-21-21-07-CEST"
+          },
+          "response": {
+            "requestId": "8hpgmku519psnsx5i1zils"
+          }
+        },
+        {
+          "nvlu": {
+            "text": "call grefe",
+            "intent": "inform",
+            "topics": {
+              "phrases": {
+                "NPS": [
+                  "grefe"
+                ],
+                "VPS": [
+                  {
+                    "verb": "call",
+                    "complement": "grefe"
+                  }
+                ]
+              },
+              "events": [
+                {
+                  "V": "call",
+                  "A1": "grefe"
+                }
+              ]
+            },
+            "emotion": {
+              "sentiment": {
+                "polarity": 0,
+                "intensity": 0
+              }
+            },
+            "timestamp": "2023-06-02-21-21-19-CEST"
+          },
+          "response": {
+            "requestId": "ersnim3k7bpf6w8pvf3f89"
+          }
+        },
+        {
+          "nvlu": {
+            "text": "nevermind",
+            "intent": "inform",
+            "topics": {
+              "phrases": {
+                "NPS": [],
+                "VPS": []
+              },
+              "events": []
+            },
+            "emotion": {
+              "sentiment": {
+                "polarity": 0,
+                "intensity": 0
+              }
+            },
+            "timestamp": "2023-06-02-21-21-26-CEST"
+          },
+          "response": {
+            "requestId": "o7ghoxprlopk94h8rnpgd"
+          }
+        },
+        {
+          "nvlu": {
+            "text": "goodbye",
+            "intent": "valediction",
+            "topics": {},
+            "emotion": {
+              "sentiment": {
+                "polarity": 0,
+                "intensity": 0
+              }
+            },
+            "timestamp": "2023-06-02-21-21-56-CEST"
+          },
+          "response": {
+            "requestId": "cx04c0b1samxbgidho1kk"
+          }
+        },
+        {
+          "content": {
+            "id": "2023-06-02-21-20-26-CEST",
+            "type": "state",
+            "value": {
+              "name": "",
+              "age": ""
+            }
+          },
+          "response": {
+            "requestId": "n8ra1e29qqir6ct7xjrpi"
+          }
+        }
+      ],
+      "messages": {
+        "updated": true
+      }
+    },
+    "nvlg": {
+      "initialized": true,
+      "requestQueue": [],
+      "response": {
+        "type": "intent",
+        "content": {
+          "text": "goodbye",
+          "intent": "valediction",
+          "topics": {},
+          "emotion": {
+            "sentiment": {
+              "polarity": 0,
+              "intensity": 0
+            }
+          },
+          "timestamp": "2023-06-02-21-21-56-CEST"
+        },
+        "interaction": {
+          "turn": "",
+          "interrupt": "",
+          "timePassed": false,
+          "timeout": 10000,
+          "timeoutFrequency": 0,
+          "time": 1685733722851,
+          "agent": {
+            "wait": false,
+            "keep": false
+          }
+        }
+      },
+      "messages": {}
+    },
+    "nvlu": {
+      "initialized": true,
+      "requestQueue": [],
+      "response": {
+        "type": "final",
+        "text": "goodbye",
+        "confidence": 0.84644943,
+        "ctml": "",
+        "timestamp": "2023-06-02-21-21-56-CEST"
+      },
+      "messages": {}
+    },
+    "auth": {
+      "initialized": true,
+      "requestQueue": [],
+      "response": {},
+      "messages": {}
+    },
+    "gui": {
+      "initialized": true,
+      "requestQueue": [],
+      "response": {
+        "gui": [
+          {
+            "type": "recording",
+            "value": false
+          }
+        ]
+      },
+      "messages": {}
+    }
+  },
+  "dialog": {
+    "user": {
+      "move": {},
+      "respond": false,
+      "isTalking": false,
+      "id": "",
+      "status": "",
+      "information": {
+        "name": "",
+        "age": ""
+      },
+      "personalized": 1
+    },
+    "agent": {
+      "move": {},
+      "questions": {
+        "asked": [],
+        "answered": []
+      },
+      "respond": true,
+      "isTalking": true
+    },
+    "chatOnly": false,
+    "greeted": false,
+    "closed": false
+  },
+  "floor": {
+    "turn": "",
+    "interrupt": "",
+    "timePassed": false,
+    "timeout": 10000,
+    "timeoutFrequency": 0,
+    "time": 1685733722851,
+    "agent": {
+      "wait": false,
+      "keep": false
+    }
+  }
+}
+
+---------------------------------------------------------------------------------------
+
+{
+  "tag": "Information State",
+  "env": {
+    "temp": {
+      "newenvmsgs": [],
+      "newenvresponses": [],
+      "newenvoutmsgs": [
+        {
+          "environment": "um",
+          "cmd": "update",
+          "msgId": "haq4gco9vvdyyeu5drbhc9",
+          "params": {
+            "content": {
+              "id": "",
+              "type": "state",
+              "value": {
+                "tts": {
+                  "text": "I've learned much about you! It was nice talking to you! Can we talk soon again? Bye!",
+                  "timestamp": "2023-06-02-21-21-57-CEST",
+                  "moveID": 8
+                }
+              }
+            },
+            "response": {
+              "requestId": "haq4gco9vvdyyeu5drbhc9"
+            }
+          }
+        }
+      ]
+    },
+    "initialized": true,
+    "initnoerror": true,
+    "environmentSpec": {
+      "environments": [
+        {
+          "id": "mw",
+          "loader": "nl.bliss.environments.GenericMiddlewareEnvironment",
+          "requiredloaders": [],
+          "params": {
+            "middleware": {
+              "loaderClass": "nl.utwente.hmi.middleware.activemq.ActiveMQMiddlewareLoader",
+              "properties": {
+                "iTopic": "BLISS/in",
+                "oTopic": "BLISS/out",
+                "amqBrokerURI": "tcp://localhost:61616"
+              }
+            }
+          }
+        },
+        {
+          "id": "gui",
+          "loader": "nl.bliss.environments.GUIEnvironment",
+          "requiredloaders": [
+            "mw"
+          ]
+        },
+        {
+          "id": "tts",
+          "loader": "nl.bliss.environments.TTSEnvironment",
+          "requiredloaders": [
+            "mw"
+          ],
+          "params": {
+            "realizer": {
+              "type": "ReadSpeaker",
+              "properties": {
+                "language": "en_us",
+                "voice": "James",
+                "streaming": "0",
+                "audioformat": "pcm"
+              }
+            }
+          }
+        },
+        {
+          "id": "um",
+          "loader": "nl.bliss.environments.UMEnvironment",
+          "requiredloaders": [
+            "mw"
+          ],
+          "params": {
+            "db": "default",
+            "name": "users",
+            "reset": false,
+            "event": "cb"
+          }
+        },
+        {
+          "id": "nvlg",
+          "loader": "nl.bliss.environments.NVLGEnvironment",
+          "requiredloaders": [
+            "um",
+            "tts"
+          ],
+          "params": {
+            "intents": "./behaviour/agentmoves_EN_CB.json",
+            "url": "http://things.ewi.utwente.nl:8190/",
+            "urlMemory": "http://things.ewi.utwente.nl:5000",
+            "language": "en"
+          }
+        },
+        {
+          "id": "nvlu",
+          "loader": "nl.bliss.environments.NVLUEnvironment",
+          "requiredloaders": [
+            "um"
+          ],
+          "params": {
+            "intents": "./behaviour/usermoves_EN.json",
+            "url": "http://things.ewi.utwente.nl:8190/",
+            "language": "en"
+          }
+        },
+        {
+          "id": "auth",
+          "loader": "nl.bliss.environments.AuthenticationEnvironment",
+          "requiredloaders": [],
+          "params": {
+            "identification": {
+              "type": "gui"
+            }
+          }
+        }
+      ]
+    }
+  },
+  "components": {
+    "mw": {
+      "initialized": true,
+      "requestQueue": [],
+      "response": {},
+      "messages": {}
+    },
+    "asr": {
+      "initialized": false,
+      "messages": {}
+    },
+    "tts": {
+      "initialized": true,
+      "requestQueue": [],
+      "response": {
+        "type": "text",
+        "parameters": {
+          "turn": "assign",
+          "emotion": "neutral",
+          "intent": "valediction",
+          "text": "I've learned much about you! It was nice talking to you! Can we talk soon again? Bye!",
+          "timestamp": "2023-06-02-21-21-56-CEST",
+          "id": 8
+        }
+      },
+      "messages": {
+        "tts": {
+          "isTalking": false,
+          "type": "feedback",
+          "timestamp": "2023-06-02-21-22-02-CEST"
+        }
+      }
+    },
+    "um": {
+      "initialized": true,
+      "requestQueue": [
+        {
+          "nvlu": {
+            "text": "my name is David",
+            "intent": "inform",
+            "topics": {
+              "phrases": {
+                "NPS": [
+                  "my name",
+                  "David"
+                ],
+                "VPS": [
+                  {
+                    "verb": "be",
+                    "complement": "David"
+                  }
+                ]
+              },
+              "events": []
+            },
+            "emotion": {
+              "sentiment": {
+                "polarity": 0,
+                "intensity": 0
+              }
+            },
+            "timestamp": "2023-06-02-21-20-42-CEST"
+          },
+          "response": {
+            "requestId": "kj1h9j1ijyrzsy4sr9c1jk"
+          }
+        },
+        {
+          "nvlu": {
+            "text": "I would love to",
+            "intent": "inform",
+            "topics": {
+              "phrases": {
+                "NPS": [],
+                "VPS": [
+                  {
+                    "verb": "love"
+                  }
+                ]
+              },
+              "events": [
+                {
+                  "A0": "I",
+                  "AM-MOD": "would",
+                  "V": "love"
+                }
+              ]
+            },
+            "emotion": {
+              "sentiment": {
+                "polarity": 0.5,
+                "intensity": 0.6
+              }
+            },
+            "timestamp": "2023-06-02-21-21-00-CEST"
+          },
+          "response": {
+            "requestId": "hkdymz5hrdo6kh2y96gx"
+          }
+        },
+        {
+          "nvlu": {
+            "text": "yes",
+            "intent": "confirm",
+            "topics": {},
+            "emotion": {
+              "sentiment": {
+                "polarity": 0,
+                "intensity": 0
+              }
+            },
+            "timestamp": "2023-06-02-21-21-07-CEST"
+          },
+          "response": {
+            "requestId": "8hpgmku519psnsx5i1zils"
+          }
+        },
+        {
+          "nvlu": {
+            "text": "call grefe",
+            "intent": "inform",
+            "topics": {
+              "phrases": {
+                "NPS": [
+                  "grefe"
+                ],
+                "VPS": [
+                  {
+                    "verb": "call",
+                    "complement": "grefe"
+                  }
+                ]
+              },
+              "events": [
+                {
+                  "V": "call",
+                  "A1": "grefe"
+                }
+              ]
+            },
+            "emotion": {
+              "sentiment": {
+                "polarity": 0,
+                "intensity": 0
+              }
+            },
+            "timestamp": "2023-06-02-21-21-19-CEST"
+          },
+          "response": {
+            "requestId": "ersnim3k7bpf6w8pvf3f89"
+          }
+        },
+        {
+          "nvlu": {
+            "text": "nevermind",
+            "intent": "inform",
+            "topics": {
+              "phrases": {
+                "NPS": [],
+                "VPS": []
+              },
+              "events": []
+            },
+            "emotion": {
+              "sentiment": {
+                "polarity": 0,
+                "intensity": 0
+              }
+            },
+            "timestamp": "2023-06-02-21-21-26-CEST"
+          },
+          "response": {
+            "requestId": "o7ghoxprlopk94h8rnpgd"
+          }
+        },
+        {
+          "nvlu": {
+            "text": "goodbye",
+            "intent": "valediction",
+            "topics": {},
+            "emotion": {
+              "sentiment": {
+                "polarity": 0,
+                "intensity": 0
+              }
+            },
+            "timestamp": "2023-06-02-21-21-56-CEST"
+          },
+          "response": {
+            "requestId": "cx04c0b1samxbgidho1kk"
+          }
+        },
+        {
+          "content": {
+            "id": "2023-06-02-21-20-26-CEST",
+            "type": "state",
+            "value": {
+              "name": "",
+              "age": ""
+            }
+          },
+          "response": {
+            "requestId": "n8ra1e29qqir6ct7xjrpi"
+          }
+        }
+      ],
+      "messages": {
+        "updated": true
+      }
+    },
+    "nvlg": {
+      "initialized": true,
+      "requestQueue": [],
+      "response": {
+        "type": "intent",
+        "content": {
+          "text": "goodbye",
+          "intent": "valediction",
+          "topics": {},
+          "emotion": {
+            "sentiment": {
+              "polarity": 0,
+              "intensity": 0
+            }
+          },
+          "timestamp": "2023-06-02-21-21-56-CEST"
+        },
+        "interaction": {
+          "turn": "",
+          "interrupt": "",
+          "timePassed": false,
+          "timeout": 10000,
+          "timeoutFrequency": 0,
+          "time": 1685733722896,
+          "agent": {
+            "wait": false,
+            "keep": false
+          }
+        }
+      },
+      "messages": {}
+    },
+    "nvlu": {
+      "initialized": true,
+      "requestQueue": [],
+      "response": {
+        "type": "final",
+        "text": "goodbye",
+        "confidence": 0.84644943,
+        "ctml": "",
+        "timestamp": "2023-06-02-21-21-56-CEST"
+      },
+      "messages": {}
+    },
+    "auth": {
+      "initialized": true,
+      "requestQueue": [],
+      "response": {},
+      "messages": {}
+    },
+    "gui": {
+      "initialized": true,
+      "requestQueue": [],
+      "response": {
+        "gui": [
+          {
+            "type": "recording",
+            "value": false
+          }
+        ]
+      },
+      "messages": {}
+    }
+  },
+  "dialog": {
+    "user": {
+      "move": {},
+      "respond": false,
+      "isTalking": false,
+      "id": "",
+      "status": "",
+      "information": {
+        "name": "",
+        "age": ""
+      },
+      "personalized": 1
+    },
+    "agent": {
+      "move": {},
+      "questions": {
+        "asked": [],
+        "answered": []
+      },
+      "respond": true,
+      "isTalking": false
+    },
+    "chatOnly": false,
+    "greeted": false,
+    "closed": false
+  },
+  "floor": {
+    "turn": "",
+    "interrupt": "",
+    "timePassed": false,
+    "timeout": 10000,
+    "timeoutFrequency": 0,
+    "time": 1685733722896,
+    "agent": {
+      "wait": false,
+      "keep": false
+    }
+  }
+}
