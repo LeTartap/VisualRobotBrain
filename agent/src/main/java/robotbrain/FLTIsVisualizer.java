@@ -9,6 +9,8 @@ import hmi.flipper2.launcher.FlipperLauncherThread;
 import net.minidev.json.JSONArray;
 
 
+
+
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.Properties;
@@ -110,9 +112,21 @@ public class FLTIsVisualizer extends FlipperLauncherThread {
 
             System.out.println("Emotion: " + jsaEmotion);
             System.out.println("Intent: " + jsaIntent);
-            System.out.println("polarity:  " + (returnLastIfNonEmpty(jsaPolarity)).toString() + ", intensity :" + (returnLastIfNonEmpty(jsaIntensity)).toString());
 
-            if (jsaQueryClauses.size() > 0) {
+            System.out.println("raw polarity:  " + (returnLastIfNonEmpty(jsaPolarity)).toString() + ", raw intensity :" + (returnLastIfNonEmpty(jsaIntensity)).toString());
+
+            if (jsaPolarity!=null && jsaPolarity.size()>0) {
+                System.out.println("polarity:  " + polarityToString(Double.valueOf(returnLastIfNonEmpty(jsaPolarity))).toString());
+            }
+            //same if statement but for intensity
+            if (jsaIntensity!=null && jsaIntensity.size()>0) {
+                System.out.println("intensity:  " + intensityToString(Double.valueOf(returnLastIfNonEmpty(jsaIntensity))).toString());
+            }
+
+
+
+
+            if (jsaQueryClauses.size() > 0 && jsaQueryClauses != null) {
                 System.out.println(jsaQueryClauses.get(jsaQueryClauses.size() - 1).toString());
             } else {
                 System.out.println(jsaQueryClauses.toString());
@@ -154,6 +168,36 @@ public class FLTIsVisualizer extends FlipperLauncherThread {
         }
     }
 
+
+    public String polarityToString(Double polarity){
+        if (polarity > 0){
+            return "positive";
+        } else if (polarity < 0){
+            return "negative";
+        } else {
+            return "neutral";
+        }
+    }
+
+
+
+    public String intensityToString(Double intensity){
+        //    |intensity| ≥ 2.5 Medium,
+        //    if 1.5 ≤ |intensity| < 2.5 Weak,
+        //    if 0.5 ≤ |intensity| < 1.5 Neutral,
+        //    if |intensity| < 0.5
+        if (intensity >= 2.5){
+            return "medium";
+        } else if (intensity >= 1.5 && intensity < 2.5){
+            return "weak";
+        } else if (intensity >= 0.5 && intensity < 1.5){
+            return "neutral";
+        } else if (intensity < 0.5){
+            return "neutral";
+        } else {
+            return "neutral";
+        }
+    }
     public void printMap(Map map) {
         for (Object name : map.keySet()) {
             String key = name.toString();
