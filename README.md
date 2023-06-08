@@ -1,5 +1,7 @@
-# Welcome to the BLISS-DM page
-
+# Flipper / Coffeebot JSON Extractor
+- this is based on the BLISS Dialogue Manager: https://gitlab.com/bliss-nl/babbelbot/-/tree/master/
+- it uses Flipper 2.0 as the core Dialogue Manager (van Waterschoot et al., 2018)
+- made for the (van Waterschoot & Theune, 2021) 
 ## Requirements
 - JDK 8+ (https://www.oracle.com/technetwork/java/javase/downloads/index.html)
 - Microphone and speakers/headphones
@@ -65,5 +67,8 @@ In the `resources\behaviour` folder of the agent there files for detecting user 
 ## Logs
 By default the system saves logs as well, containing the transcriptions. Though you can save conversations through the `File` menu as well.
 
-## Maintainer
-Jelte van Waterschoot (j.b.vanwaterschoot@utwente.nl)
+
+## References
+- van Waterschoot, J., Bruijnes, M., Flokstra, J., Reidsma, D., Davison, D., Theune, M., & Heylen, D. (2018). Flipper 2.0: A Pragmatic Dialogue Engine for Embodied Conversational Agents. Proceedings of the 18th International Conference on Intelligent Virtual Agents, 43–50. https://doi.org/10.1145/3267851.3267882
+- van Waterschoot, J., & Theune, M. (2021). Evaluating Conversational Question Generation: CoffeeBot.
+
