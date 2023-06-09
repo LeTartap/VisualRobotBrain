@@ -9,13 +9,24 @@ import hmi.flipper2.launcher.FlipperLauncherThread;
 import net.minidev.json.JSONArray;
 
 
-
-
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
 public class FLTIsVisualizer extends FlipperLauncherThread {
+    private ValueUpdateListener listener;
+    private GUI gui;
+
+
+    private Map<String, String> updatedValues;
+
+    public FLTIsVisualizer(Properties ps) throws FlipperException {
+        super(ps);
+    }
+
+
+
 
     //      so, your flipper object (flt) will have an templatecpontroller (tc)
 //      which has an information state (is) object. flt.tc.is.xxxxxx
@@ -32,6 +43,10 @@ public class FLTIsVisualizer extends FlipperLauncherThread {
 //        return null;
 //    }
 
+
+    public void setListener(ValueUpdateListener listener) {
+        this.listener = listener;
+    }
     @Override
     public void updateGUI() {
         super.updateGUI();
@@ -110,40 +125,83 @@ public class FLTIsVisualizer extends FlipperLauncherThread {
             System.out.println();
             System.out.println();
 
-            System.out.println("Emotion: " + jsaEmotion);
-            System.out.println("Intent: " + jsaIntent);
 
-            System.out.println("raw polarity:  " + (returnLastIfNonEmpty(jsaPolarity)).toString() + ", raw intensity :" + (returnLastIfNonEmpty(jsaIntensity)).toString());
 
-            if (jsaPolarity!=null && jsaPolarity.size()>0) {
-                System.out.println("polarity:  " + polarityToString(Double.valueOf(returnLastIfNonEmpty(jsaPolarity))).toString());
+
+
+            String emotionString;
+            String intentString;
+            String jsonQueryClausesString;
+            String rawPolarity;
+            String rawIntensity;
+            String polarityString = "";
+            String intensityString = "";
+
+
+            emotionString = returnLastIfNonEmpty(jsaEmotion);
+            intentString = returnLastIfNonEmpty(jsaIntent);
+
+            System.out.println("Emotion: " + emotionString);
+            System.out.println("Intent: " + intentString);
+
+            if (jsaPolarity != null && jsaPolarity.size() > 0) {
+                rawPolarity = (returnLastIfNonEmpty(jsaPolarity)).toString();
+                polarityString = polarityToString(Double.valueOf(returnLastIfNonEmpty(jsaPolarity))).toString();
+                System.out.println("polarity raw:  "+ rawPolarity + "polarity meaning :"+ polarityString);
+
+
             }
-            //same if statement but for intensity
-            if (jsaIntensity!=null && jsaIntensity.size()>0) {
-                System.out.println("intensity:  " + intensityToString(Double.valueOf(returnLastIfNonEmpty(jsaIntensity))).toString());
+            if (jsaIntensity != null && jsaIntensity.size() > 0) {
+                rawIntensity = (returnLastIfNonEmpty(jsaIntensity)).toString();
+                intensityString = intensityToString(Double.valueOf(returnLastIfNonEmpty(jsaIntensity))).toString();
+                System.out.println("raw intensity:  " + rawIntensity+ "intensity meaning :"+ intensityString);
             }
 
-
+            System.out.println("---------------------------------------------------------------------------------------");
 
 
             if (jsaQueryClauses.size() > 0 && jsaQueryClauses != null) {
-                System.out.println(jsaQueryClauses.get(jsaQueryClauses.size() - 1).toString());
+                jsonQueryClausesString = jsaQueryClauses.get(jsaQueryClauses.size() - 1).toString();
+                System.out.println(jsonQueryClausesString);
             } else {
-                System.out.println(jsaQueryClauses.toString());
+                jsonQueryClausesString = jsaQueryClauses.toString();
+                System.out.println(jsonQueryClausesString);
             }
 
 //            this will output and array like this:
 //            [[{"verb":"be","complement":"David"}],[],[{"verb":"be","complement":"a rapper"}],[],[],[{"verb":"bring","complement":"the smell of Christmas candles"}],[],[],[{"verb":"talk"},{"verb":"talk","complement":"have fun"}],[{"verb":"aviation","complement":"airplanes"}],[{"verb":"work"},{"verb":"fly"}],[{"verb":"be","complement":"am allergic to cats"}],[]]
 //            use index -1 to get the most recent one
 
-            System.out.println(returnLastIfNonEmpty(jsaA0AMV).toString());
+            String jsaA0AMVString = returnLastIfNonEmpty(jsaA0AMV).toString();
+
+            System.out.println(jsaA0AMVString);
+
             System.out.println("The robot understood:");
-            System.out.println(returnLastIfNonEmpty(understoodByTheRobot).toString());
+
+            String understoodByTheRobotString = returnLastIfNonEmpty(understoodByTheRobot).toString();
+
+            System.out.println(understoodByTheRobotString);
             System.out.println();
             System.out.println();
             System.out.println("---------------------------------------------------------------------------------------");
 
+
+            updatedValues = new HashMap<>();
+            updatedValues.put("variable0", understoodByTheRobotString);
+            updatedValues.put("variable1", emotionString);
+            updatedValues.put("variable2", intentString);
+            updatedValues.put("variable3", polarityString);
+            updatedValues.put("variable4", intensityString);
+
+            updatedValues.put("variable5", jsonQueryClausesString);
+            updatedValues.put("variable6", jsaA0AMVString);
+
+
 //            System.out.println(isJSONString);
+            // Notify the listener with the updated values
+            if (listener != null) {
+                listener.onValuesUpdated(updatedValues);
+            }
 
         } catch (FlipperException e) {
             throw new RuntimeException(e);
@@ -169,10 +227,10 @@ public class FLTIsVisualizer extends FlipperLauncherThread {
     }
 
 
-    public String polarityToString(Double polarity){
-        if (polarity > 0){
+    public String polarityToString(Double polarity) {
+        if (polarity > 0) {
             return "positive";
-        } else if (polarity < 0){
+        } else if (polarity < 0) {
             return "negative";
         } else {
             return "neutral";
@@ -180,24 +238,24 @@ public class FLTIsVisualizer extends FlipperLauncherThread {
     }
 
 
-
-    public String intensityToString(Double intensity){
+    public String intensityToString(Double intensity) {
         //    |intensity| ≥ 2.5 Medium,
         //    if 1.5 ≤ |intensity| < 2.5 Weak,
         //    if 0.5 ≤ |intensity| < 1.5 Neutral,
         //    if |intensity| < 0.5
-        if (intensity >= 2.5){
+        if (intensity >= 2.5) {
             return "medium";
-        } else if (intensity >= 1.5 && intensity < 2.5){
+        } else if (intensity >= 1.5 && intensity < 2.5) {
             return "weak";
-        } else if (intensity >= 0.5 && intensity < 1.5){
+        } else if (intensity >= 0.5 && intensity < 1.5) {
             return "neutral";
-        } else if (intensity < 0.5){
+        } else if (intensity < 0.5) {
             return "neutral";
         } else {
             return "neutral";
         }
     }
+
     public void printMap(Map map) {
         for (Object name : map.keySet()) {
             String key = name.toString();
@@ -211,9 +269,5 @@ public class FLTIsVisualizer extends FlipperLauncherThread {
         System.out.flush();
     }
 
-    public FLTIsVisualizer(Properties ps) throws FlipperException {
-        super(ps);
 
-
-    }
 }
